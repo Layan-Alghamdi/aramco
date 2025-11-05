@@ -1,0 +1,51 @@
+:root{
+  --text:#0b0b0c;
+  --muted:#5f6368;
+  --surface:#ffffff;
+  --border:#e8e8ef;
+  --cta:#1b0c3a;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--text);
+  background:#fff;
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+
+.container{width:min(1160px,92%);margin:0 auto}
+
+/* Header */
+.site-header{position:sticky;top:0;background:var(--surface);z-index:10}
+.header-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:20px 0}
+.nav{justify-self:end}
+.brand-logo{height:84px;object-fit:contain}
+.nav ul{display:flex;gap:48px;list-style:none;margin:0;padding:0}
+.nav{font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+.nav-link{text-decoration:none;color:#6b7280;font-weight:400;font-family:inherit}
+.nav-link.active{color:#111}
+.nav-link:hover{color:#111}
+
+/* Hero */
+.hero{padding:56px 0 80px}
+.hero-inner{display:grid;grid-template-columns:1.05fr 1fr;align-items:center;gap:36px}
+.hero-title{margin:0 0 16px;font-size:clamp(28px,3.2vw + 8px,48px);line-height:1.05;font-weight:800}
+.hero-subtitle{margin:0 0 28px;color:var(--muted);font-size:18px;max-width:640px}
+
+.cta{display:inline-flex;align-items:center;gap:14px;text-decoration:none;font-weight:700;color:#1b1630;background:#fff;border:2px solid #e6e6f2;border-radius:40px;padding:14px 18px 14px 24px}
+.cta-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:999px;background:var(--cta)}
+
+.hero-visual{height:min(520px,62vh);border-radius:26px;background:
+  radial-gradient(1200px 600px at -10% 20%, #f5f2ff 0%, #eef 22%, rgba(231,239,255,0) 45%),
+  radial-gradient(900px 600px at 55% 30%, #cfe1ff 0%, #6ea0e7 40%, #2e65bf 65%, rgba(0,0,0,0) 70%),
+  linear-gradient(135deg, #147cfa 0%, #0f71b1 35%, #0aa35e 74%, #29c23c 100%);
+}
+
+@media (max-width: 980px){
+  .hero-inner{grid-template-columns:1fr;gap:28px}
+  .hero-visual{order:2;height:420px}
+}
+
+
