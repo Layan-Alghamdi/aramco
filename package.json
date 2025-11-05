@@ -1,0 +1,19 @@
+{
+  "name": "aramco-digital-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "echo build placeholder",
+    "dev": "echo root dev placeholder",
+    "lint": "echo lint placeholder",
+    "typecheck": "echo typecheck placeholder"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
+
