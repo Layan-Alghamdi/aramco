@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  image     String?
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  presentations Presentation[] @relation("UserPresentations")
+  comments   Comment[]
+  permissions Permission[]
+}
+
+model Presentation {
+  id         String   @id @default(cuid())
+  title      String
+  ownerId    String
+  owner      User     @relation(fields: [ownerId], references: [id], name: "UserPresentations")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isDeleted  Boolean  @default(false)
+  version    Int      @default(1)
+  slides     Slide[]
+  permissions Permission[]
+  versions   Version[]
+}
+
+model Slide {
+  id             String   @id @default(cuid())
+  presentationId String
+  presentation   Presentation @relation(fields: [presentationId], references: [id])
+  index          Int
+  background     Json?
+  locked         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  elements       Element[]
+  comments       Comment[]
+}
+
+model Element {
+  id        String   @id @default(cuid())
+  slideId   String
+  slide     Slide    @relation(fields: [slideId], references: [id])
+  type      ElementType
+  json      Json
+  locked    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id             String   @id @default(cuid())
+  presentationId String
+  userId         String
+  role           Role
+  presentation   Presentation @relation(fields: [presentationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+  @@unique([presentationId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  slideId   String
+  userId    String
+  text      String
+  createdAt DateTime @default(now())
+  resolved  Boolean  @default(false)
+  slide     Slide    @relation(fields: [slideId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Version {
+  id             String   @id @default(cuid())
+  presentationId String
+  label          String
+  snapshotJSON   Json
+  createdAt      DateTime @default(now())
+  presentation   Presentation @relation(fields: [presentationId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum ElementType {
+  TEXT
+  IMAGE
+  SHAPE
+  ICON
+}
+

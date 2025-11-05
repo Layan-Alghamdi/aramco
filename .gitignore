@@ -12,3 +12,15 @@ pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
+
+# Local backup merged by assistant
+
+node_modules
+
+# Node and Next build artifacts
+node_modules
+.next
+.out
+coverage
+*.log
+
