@@ -68,10 +68,10 @@ export default function Dashboard() {
         <img
           src={logo}
           alt="Aramco Digital"
-          className="absolute top-8 left-10 z-10 h-14 md:h-16 w-auto"
+          className="absolute top-0 left-10 -translate-y-2 z-10 h-14 md:h-16 w-auto"
         />
 
-        <nav className="absolute top-8 right-10 z-10">
+        <nav className="absolute top-0 right-12 -translate-y-2 z-10">
           <ul className="flex items-center gap-8 text-[#6B7280] font-medium">
             {"Home Notification Features About".split(" ").map((item) => (
               <li key={item} className="hover:opacity-80 transition">{item}</li>
@@ -86,12 +86,12 @@ export default function Dashboard() {
                 key={card.title}
                 type="button"
                 onClick={() => handleCardClick(card.path)}
-                className="w-[240px] h-[200px] rounded-2xl border border-[#E5E7EB] bg-white/80 backdrop-blur flex flex-col items-center justify-center gap-5 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)] cursor-pointer"
+                className="w-[260px] h-[220px] rounded-2xl border border-[#E5E7EB] bg-white/80 backdrop-blur flex flex-col items-center justify-center gap-6 shadow-[0_12px_26px_rgba(15,23,42,0.1)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(15,23,42,0.14)] cursor-pointer"
               >
-                <div className="w-14 h-14 rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
                   {card.icon}
                 </div>
-                <span className="text-lg font-semibold text-[#4B5563]">{card.title}</span>
+                <span className="text-xl font-semibold text-[#4B5563]">{card.title}</span>
               </button>
             ))}
           </div>
