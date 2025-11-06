@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Editor from "./pages/Editor";
 
 const ProtectedRoute = ({ children }) => {
   const isAuth = typeof window !== "undefined" && localStorage.getItem("isAuth") === "1";
@@ -22,6 +23,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create"
+        element={
+          <ProtectedRoute>
+            <Editor />
           </ProtectedRoute>
         }
       />
