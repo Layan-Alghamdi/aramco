@@ -53,6 +53,10 @@ export default function Dashboard() {
     navigate(path);
   };
 
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
   return (
     <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
       <div className="relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
@@ -95,15 +99,19 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="absolute bottom-6 left-8 flex flex-col items-center gap-2 text-[#6B7280]">
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#6B7280] flex items-center justify-center text-white">
+          <button
+            type="button"
+            onClick={handleProfileClick}
+            className="absolute bottom-6 left-8 flex flex-col items-center gap-2 text-[#6B7280] hover:text-[#374151] transition"
+          >
+            <span className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#6B7280] flex items-center justify-center text-white">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor">
                 <circle cx="12" cy="9" r="4" />
                 <path d="M5 21c0-3.866 3.134-7 7-7s7 3.134 7 7" />
               </svg>
-            </div>
+            </span>
             <span className="text-sm font-medium">Profile</span>
-          </div>
+          </button>
 
           {toast && (
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-[#1F2937] text-white text-sm px-4 py-2 rounded-full shadow-lg">
