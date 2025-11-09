@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import VideoPlayer from "../components/VideoPlayer";
 
 const uuid = () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `id-${Math.random().toString(36).slice(2)}`);
 
@@ -100,6 +101,7 @@ export default function Editor() {
   const slideWrapperRef = useRef(null);
   const editableRefs = useRef(new Map());
   const fileInputRef = useRef(null);
+  const videoFileInputRef = useRef(null);
   const interactionRef = useRef(interaction);
 
   useEffect(() => {
@@ -553,6 +555,29 @@ export default function Editor() {
     event.target.value = "";
   };
 
+  const handleVideoUploadClick = () => {
+    videoFileInputRef.current?.click();
+  };
+
+  const handleVideoFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== "string") return;
+      addObjectToActiveSlide(
+        createVideoObject({
+          sourceType: "upload",
+          src: result,
+          fileName: file.name
+        })
+      );
+    };
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  };
+
   const handleAddImageFromUrl = () => {
     const url = window.prompt("Paste image URL");
     if (!url) return;
@@ -578,6 +603,37 @@ export default function Editor() {
     });
   };
 
+  const createVideoObject = ({ sourceType, src, fileName }) => ({
+    type: "video",
+    sourceType,
+    src: src ?? "",
+    fileName: fileName ?? "",
+    autoplay: false,
+    loop: false,
+    muted: true,
+    poster: "",
+    playbackRate: 1,
+    w: 420,
+    h: 260,
+    zIndex: computeNextZIndex()
+  });
+
+  const detectExternalVideoSource = (url) => {
+    if (/youtube\.com|youtu\.be/i.test(url)) return "youtube";
+    if (/vimeo\.com/i.test(url)) return "vimeo";
+    return "url";
+  };
+
+  const handleEmbedVideoPrompt = () => {
+    const url = window.prompt("Paste video URL (YouTube, Vimeo, or direct MP4)");
+    if (!url) return;
+    addObjectToActiveSlide(
+      createVideoObject({
+        sourceType: detectExternalVideoSource(url),
+        src: url
+      })
+    );
+  };
   const handleApplyBrandColor = (color) => {
     if (!selectedObject) {
       applyColor(color);
@@ -711,6 +767,7 @@ export default function Editor() {
 
       <div className="relative z-10 flex min-h-screen flex-col px-8 py-8 gap-6">
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageFileChange} className="hidden" />
+        <input type="file" accept="video/mp4,video/quicktime,video/webm" ref={videoFileInputRef} onChange={handleVideoFileChange} className="hidden" />
 
         <header className="flex items-center justify-between rounded-3xl bg-white/80 px-6 py-4 shadow-[0_18px_45px_rgba(32,64,128,0.18)] backdrop-blur-lg">
           <div className="flex items-center gap-4">
@@ -840,6 +897,20 @@ export default function Editor() {
               className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
             >
               Image URL
+            </button>
+            <button
+              type="button"
+              onClick={handleVideoUploadClick}
+              className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
+            >
+              Video Upload
+            </button>
+            <button
+              type="button"
+              onClick={handleEmbedVideoPrompt}
+              className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
+            >
+              Video URL
             </button>
           </ToolbarSection>
 
@@ -1026,6 +1097,15 @@ export default function Editor() {
                           />
                         );
                       }
+      if (obj.type === "video") {
+        return (
+          <VideoPlayer
+            object={obj}
+            onChange={(updates) => updateObject(obj.id, () => updates)}
+            isSelected={isSelected}
+          />
+        );
+      }
 
                       if (obj.type === "chart") {
                         const accent = obj.accentColor || "#3E6DCC";
