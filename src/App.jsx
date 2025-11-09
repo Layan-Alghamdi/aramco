@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Editor from "./pages/Editor";
+import ChangePassword from "./pages/ChangePassword";
+import NotificationPreferences from "./pages/NotificationPreferences";
 
 const ProtectedRoute = ({ children }) => {
   const isAuth = typeof window !== "undefined" && localStorage.getItem("isAuth") === "1";
@@ -41,6 +43,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationPreferences />
           </ProtectedRoute>
         }
       />

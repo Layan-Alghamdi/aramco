@@ -2,6 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 
+const SESSION_DURATION_MS = 5 * 60 * 1000;
+
+async function hashString(value) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(value);
+  const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function createSession() {
+  const token = window.crypto.randomUUID();
+  const expiresAt = Date.now() + SESSION_DURATION_MS;
+  window.localStorage.setItem("sessionToken", token);
+  window.localStorage.setItem("sessionExpiry", String(expiresAt));
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -14,7 +32,7 @@ export default function Login() {
     }
   }, [navigate]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
 
@@ -28,8 +46,14 @@ export default function Login() {
       return;
     }
 
-    localStorage.setItem("isAuth", "1");
-    localStorage.setItem("userEmail", trimmedEmail);
+    const hashedPassword = await hashString(trimmedPassword);
+
+    window.localStorage.setItem("userEmail", trimmedEmail);
+    window.localStorage.setItem("userPasswordHash", hashedPassword);
+
+    window.localStorage.setItem("isAuth", "1");
+    window.localStorage.removeItem("userPassword");
+    createSession();
     setError("");
     navigate("/dashboard");
   };
