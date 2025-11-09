@@ -9,6 +9,9 @@ import Editor from "./pages/Editor";
 import Notifications from "./pages/Notifications";
 import Features from "./pages/Features";
 import About from "./pages/About";
+import NewTeam from "./pages/NewTeam";
+import TeamOverview from "./pages/TeamOverview";
+import EditTeam from "./pages/EditTeam";
 
 const ProtectedRoute = ({ children }) => {
   const isAuth = typeof window !== "undefined" && localStorage.getItem("isAuth") === "1";
@@ -55,6 +58,30 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Editor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/new"
+        element={
+          <ProtectedRoute>
+            <NewTeam />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:teamId"
+        element={
+          <ProtectedRoute>
+            <TeamOverview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:teamId/edit"
+        element={
+          <ProtectedRoute>
+            <EditTeam />
           </ProtectedRoute>
         }
       />
