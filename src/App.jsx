@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import Editor from "./pages/Editor";
 
 const ProtectedRoute = ({ children }) => {
   const isAuth = typeof window !== "undefined" && localStorage.getItem("isAuth") === "1";
@@ -40,6 +41,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create"
+        element={
+          <ProtectedRoute>
+            <Editor />
           </ProtectedRoute>
         }
       />

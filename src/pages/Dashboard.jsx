@@ -32,19 +32,20 @@ const icons = {
 };
 
 const cards = [
-  { title: "Create", path: "/projects/create", icon: icons.plusCircle },
+  { title: "Create", path: "/create", icon: icons.plusCircle },
   { title: "Projects", path: "/projects", icon: icons.folder },
   { title: "New team", path: "/teams/new", icon: icons.userPlus },
   { title: "your teams", path: "/teams", icon: icons.users }
 ];
 
-const missingRoutes = new Set(["/projects/create", "/projects", "/teams/new", "/teams"]);
+const missingRoutes = new Set(["/projects", "/teams/new", "/teams"]);
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [toast, setToast] = useState("");
 
   const handleCardClick = (path) => {
+    if (!path) return;
     if (missingRoutes.has(path)) {
       setToast("Not implemented yet");
       setTimeout(() => setToast(""), 2200);
