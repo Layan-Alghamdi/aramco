@@ -1,30 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import SiteHeader from "../components/SiteHeader";
 
 export default function Home() {
   return (
     <main className="mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20">
       {/* Top Navbar */}
-      <header className="mb-8 md:mb-10">
-        <div className="flex items-center justify-between">
-          {/* Left: aramco digital logo (text + square) */}
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Aramco Digital" className="h-16 md:h-20 w-auto" />
-          </div>
-
-          {/* Center nav */}
-          <nav className="hidden md:block">
-            <ul className="flex items-center gap-10 text-[#6B7280] font-medium">
-              <li><a className="hover:opacity-80 transition" href="#home">Home</a></li>
-              <li><a className="hover:opacity-80 transition" href="#features">Features</a></li>
-              <li><a className="hover:opacity-80 transition" href="#templates">Templates</a></li>
-              <li><a className="hover:opacity-80 transition" href="#about">About</a></li>
-            </ul>
-          </nav>
-          <div className="md:hidden" />
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero Block */}
       <section className="relative overflow-hidden rounded-[28px] min-h-[520px]">

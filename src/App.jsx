@@ -5,7 +5,15 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import CreateProject from "./pages/CreateProject";
+import Projects from "./pages/Projects";
 import Editor from "./pages/Editor";
+import Notifications from "./pages/Notifications";
+import Features from "./pages/Features";
+import About from "./pages/About";
+import NewTeam from "./pages/NewTeam";
+import TeamOverview from "./pages/TeamOverview";
+import EditTeam from "./pages/EditTeam";
 import ChangePassword from "./pages/ChangePassword";
 import NotificationPreferences from "./pages/NotificationPreferences";
 
@@ -21,6 +29,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/features" element={<Features />} />
+      <Route path="/about" element={<About />} />
       <Route path="/login" element={<Login />} />
       <Route
         path="/dashboard"
@@ -66,7 +77,47 @@ export default function App() {
         path="/create"
         element={
           <ProtectedRoute>
+            <CreateProject />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects"
+        element={
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/editor/:projectId"
+        element={
+          <ProtectedRoute>
             <Editor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/new"
+        element={
+          <ProtectedRoute>
+            <NewTeam />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:teamId"
+        element={
+          <ProtectedRoute>
+            <TeamOverview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:teamId/edit"
+        element={
+          <ProtectedRoute>
+            <EditTeam />
           </ProtectedRoute>
         }
       />
