@@ -31,7 +31,7 @@ const DEFAULT_TEXT_PROPS = {
 };
 
 const gradientBackground =
-  "radial-gradient(115% 115% at 50% 50%, #E6EEFF 0%, #93B9FF 55%, #3E6DCC 100%)";
+  "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)";
 
 const GRID_SIZE = 10;
 const MIN_SIZE = 48;
@@ -702,11 +702,11 @@ export default function Editor() {
       <div className="absolute inset-0 pointer-events-none" style={{ background: gradientBackground }} />
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%)" }}
+        style={{ background: "radial-gradient(125% 125% at 0% 0%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0) 65%)" }}
       />
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(120% 120% at 100% 100%, rgba(9,30,66,0.4) 0%, rgba(9,30,66,0) 65%)" }}
+        style={{ background: "radial-gradient(120% 120% at 100% 100%, rgba(12,124,89,0.38) 0%, rgba(62,109,204,0.18) 35%, rgba(62,109,204,0) 70%)" }}
       />
 
       <div className="relative z-10 flex min-h-screen flex-col px-8 py-8 gap-6">

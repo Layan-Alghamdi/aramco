@@ -70,7 +70,7 @@ export default function Dashboard() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(115% 115% at 50% 50%, #E6EEFF 0%, #93B9FF 55%, #3E6DCC 100%)"
+              "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)"
           }}
         />
         <div
@@ -78,7 +78,7 @@ export default function Dashboard() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 35%, rgba(255,255,255,0) 60%)"
+              "radial-gradient(125% 125% at 0% 0%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0) 65%)"
           }}
         />
         <div
@@ -86,7 +86,7 @@ export default function Dashboard() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(110% 110% at 100% 100%, rgba(23,48,107,0.55) 0%, rgba(23,48,107,0.12) 40%, rgba(23,48,107,0) 70%)"
+              "radial-gradient(120% 120% at 100% 100%, rgba(12,124,89,0.38) 0%, rgba(62,109,204,0.18) 35%, rgba(62,109,204,0) 70%)"
           }}
         />
 
