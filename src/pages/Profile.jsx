@@ -72,18 +72,9 @@ export default function Profile() {
   };
 
   return (
-    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
-      <div className="relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)'
-          }}
-        />
-
-        <div className="relative z-10 flex h-full flex-col px-10 pt-8 pb-12">
+    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]" style={{ background: "radial-gradient(circle at 20% 20%, #00A98E 0%, #2B7AC8 100%)" }}>
+      <div className="w-full max-w-[1200px] rounded-[28px] bg-white shadow-[0_12px_50px_rgba(31,41,55,0.12)]">
+        <div className="flex h-full flex-col px-10 pt-8 pb-12">
           <header className="flex items-center justify-between">
             <img src={logo} alt="Aramco Digital" className="h-14 md:h-16 w-auto" />
             <button
