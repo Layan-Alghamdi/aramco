@@ -1,6 +1,6 @@
 const THEME_STORAGE_KEY = "theme";
 
-function getSystemTheme() {
+function getSystemPreference() {
   if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
@@ -12,16 +12,17 @@ export function getStoredTheme() {
 
 export function applyTheme(theme) {
   if (typeof document === "undefined") return;
-  const root = document.documentElement;
-  const resolvedTheme = theme === "system" ? getSystemTheme() : theme;
 
-  if (resolvedTheme === "dark") {
+  const root = document.documentElement;
+  const resolved = theme === "system" ? getSystemPreference() : theme;
+
+  if (resolved === "dark") {
     root.classList.add("dark");
   } else {
     root.classList.remove("dark");
   }
 
-  root.style.colorScheme = resolvedTheme;
+  root.style.colorScheme = resolved;
 }
 
 export function setTheme(theme) {
@@ -33,26 +34,26 @@ export function setTheme(theme) {
 export function initializeTheme() {
   if (typeof window === "undefined") return () => {};
 
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  applyTheme(getStoredTheme());
+
   const handleChange = () => {
     if (getStoredTheme() === "system") {
       applyTheme("system");
     }
   };
 
-  applyTheme(getStoredTheme());
-
-  if (typeof mediaQuery.addEventListener === "function") {
-    mediaQuery.addEventListener("change", handleChange);
-  } else if (typeof mediaQuery.addListener === "function") {
-    mediaQuery.addListener(handleChange);
+  if (typeof media.addEventListener === "function") {
+    media.addEventListener("change", handleChange);
+  } else if (typeof media.addListener === "function") {
+    media.addListener(handleChange);
   }
 
   return () => {
-    if (typeof mediaQuery.removeEventListener === "function") {
-      mediaQuery.removeEventListener("change", handleChange);
-    } else if (typeof mediaQuery.removeListener === "function") {
-      mediaQuery.removeListener(handleChange);
+    if (typeof media.removeEventListener === "function") {
+      media.removeEventListener("change", handleChange);
+    } else if (typeof media.removeListener === "function") {
+      media.removeListener(handleChange);
     }
   };
 }

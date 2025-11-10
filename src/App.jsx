@@ -5,6 +5,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import CreateProject from "./pages/CreateProject";
+import Projects from "./pages/Projects";
 import Editor from "./pages/Editor";
 import Notifications from "./pages/Notifications";
 import Features from "./pages/Features";
@@ -72,7 +74,39 @@ export default function App() {
         }
       />
       <Route
+        path="/profile/password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationPreferences />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/create"
+        element={
+          <ProtectedRoute>
+            <CreateProject />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects"
+        element={
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/editor/:projectId"
         element={
           <ProtectedRoute>
             <Editor />

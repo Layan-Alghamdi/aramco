@@ -6,8 +6,7 @@ import Toast from "@/components/Toast";
 import TeamsGrid from "@/components/TeamsGrid";
 import useTeams from "@/hooks/useTeams";
 
-const iconColor = "#6B7280";
-
+const iconColor = "#3E6DCC";
 const iconSize = 28;
 
 const icons = {
@@ -39,6 +38,10 @@ export default function Dashboard() {
 
   const handleCardClick = (path) => {
     if (!path) return;
+    if (path === "/projects") {
+      navigate("/projects");
+      return;
+    }
     if (missingRoutes.has(path)) {
       setToast("Not implemented yet");
       setTimeout(() => setToast(""), 2200);
@@ -61,7 +64,7 @@ export default function Dashboard() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)'
+                "radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)"
             }}
           />
 

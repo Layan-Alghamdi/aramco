@@ -41,15 +41,15 @@ function loadPreferences() {
 export default function NotificationPreferences() {
   const navigate = useNavigate();
   const [preferences, setPreferences] = useState(defaultPreferences);
+  const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setPreferences(loadPreferences());
   }, []);
 
-  const channels = useMemo(
+  const channelToggles = useMemo(
     () => [
       { key: "email", label: "Email" },
       { key: "inApp", label: "In-app" },
@@ -58,7 +58,7 @@ export default function NotificationPreferences() {
     []
   );
 
-  const events = useMemo(
+  const eventToggles = useMemo(
     () => [
       { key: "projectUpdates", label: "Project updates" },
       { key: "mentions", label: "Mentions" },
@@ -67,13 +67,13 @@ export default function NotificationPreferences() {
     []
   );
 
-  const toggleChannel = (key) => {
+  const handleChannelToggle = (key) => {
     setStatusMessage("");
     setErrorMessage("");
     setPreferences((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const toggleEvent = (key) => {
+  const handleEventToggle = (key) => {
     setStatusMessage("");
     setErrorMessage("");
     setPreferences((prev) => ({
@@ -99,31 +99,34 @@ export default function NotificationPreferences() {
             body: JSON.stringify(preferences)
           });
 
-          if (!response.ok && response.status !== 404) {
-            const payload = await response.json().catch(() => ({}));
-            throw new Error(payload.message || "Unable to save preferences.");
+          if (response.ok) {
+            console.info("Notification preferences synced with server.");
+          } else if (response.status === 404) {
+            console.info("Notification preferences endpoint not available; stored locally only.");
+          } else {
+            const errorPayload = await response.json().catch(() => ({}));
+            throw new Error(errorPayload.message || "Unable to save preferences.");
           }
         } catch (networkError) {
-          if (!(networkError instanceof TypeError)) {
+          if (networkError instanceof TypeError) {
+            console.warn("Network error while syncing preferences; stored locally.", networkError);
+          } else {
             throw networkError;
           }
         }
       }
 
       setStatusMessage("Preferences saved successfully.");
-    } catch (err) {
-      console.error(err);
-      setErrorMessage(err instanceof Error ? err.message : "Failed to save preferences.");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(error instanceof Error ? error.message : "Failed to save notification preferences.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const renderToggle = ({ key, label }, checked, onToggle) => (
-    <div
-      key={key}
-      className="flex items-center justify-between rounded-[20px] bg-white/80 px-4 py-3 shadow-[0_6px_20px_rgba(15,23,42,0.08)] transition-colors"
-    >
+  const renderToggleRow = ({ key, label }, checked, onToggle) => (
+    <div className="flex items-center justify-between rounded-[20px] bg-white/80 px-4 py-3 shadow-[0_6px_20px_rgba(15,23,42,0.08)]" key={key}>
       <span className="text-base font-semibold text-[#111827]">{label}</span>
       <button
         type="button"
@@ -174,37 +177,50 @@ export default function NotificationPreferences() {
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold text-[#111827] tracking-tight">Notification Preferences</h1>
                 <p className="text-sm text-[#6B7280]">
-                  Decide how you’d like to be notified about updates, mentions, and security events.
+                  Choose how you’d like to stay informed about updates, mentions, and security events.
                 </p>
               </div>
 
               <section className="space-y-4">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Channels</h2>
+                <div>
+                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Channels</h2>
+                </div>
                 <div className="space-y-3">
-                  {channels.map((channel) => renderToggle(channel, preferences[channel.key], toggleChannel))}
+                  {channelToggles.map((toggle) => renderToggleRow(toggle, preferences[toggle.key], handleChannelToggle))}
                 </div>
               </section>
 
               <section className="space-y-4">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Events</h2>
+                <div>
+                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Events</h2>
+                </div>
                 <div className="space-y-3">
-                  {events.map((evt) => renderToggle(evt, preferences.events[evt.key], toggleEvent))}
+                  {eventToggles.map((toggle) =>
+                    renderToggleRow(toggle, preferences.events[toggle.key], handleEventToggle)
+                  )}
                 </div>
               </section>
 
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isSaving ? "Saving…" : "Save"}
-              </button>
+              <div className="flex items-center justify-center pt-2">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSaving ? "Saving…" : "Save"}
+                </button>
+              </div>
 
               {statusMessage && (
-                <div className="rounded-2xl bg-[#ECFDF5] px-4 py-3 text-sm font-medium text-[#047857]">{statusMessage}</div>
+                <div className="rounded-2xl bg-[#ECFDF5] px-4 py-3 text-sm font-medium text-[#047857]">
+                  {statusMessage}
+                </div>
               )}
+
               {errorMessage && (
-                <div className="rounded-2xl bg-[#FEF2F2] px-4 py-3 text-sm font-medium text-[#B91C1C]">{errorMessage}</div>
+                <div className="rounded-2xl bg-[#FEF2F2] px-4 py-3 text-sm font-medium text-[#B91C1C]">
+                  {errorMessage}
+                </div>
               )}
             </form>
           </div>

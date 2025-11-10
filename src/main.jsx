@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 import { initializeTheme } from "./utils/theme";
+import { ProjectsProvider } from "./context/ProjectsContext";
 
 initializeTheme();
 
@@ -12,7 +13,9 @@ const root = createRoot(container);
 
 root.render(
   <BrowserRouter>
-    <App />
+    <ProjectsProvider>
+      <App />
+    </ProjectsProvider>
   </BrowserRouter>
 );
 
