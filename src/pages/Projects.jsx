@@ -2,8 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { slideTemplateMap } from "../templates/brandTemplates";
-import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import SharedHeader from "@/components/SharedHeader";
 import useCurrentUser from "@/hooks/useCurrentUser";
+
+const backgroundGradient = {
+  background: "radial-gradient(circle at 20% 20%, #00A98E 0%, #2B7AC8 100%)"
+};
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -80,13 +84,10 @@ export default function Projects() {
   }, [orderedProjects, activeFilter, currentUser]);
 
   return (
-    <section className="min-h-screen relative font-['Poppins',ui-sans-serif] text-[#1E1E1E]">
-      {backgroundLayers.map((layer) => (
-        <div key={layer} aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: layer }} />
-      ))}
-
-      <div className="relative z-10 flex min-h-screen flex-col px-8 py-10 animate-fade-in">
-        <header className="flex items-center justify-between">
+    <div className="min-h-screen" style={backgroundGradient}>
+      <SharedHeader variant="dashboard" />
+      <main className="relative z-10 flex min-h-screen flex-col px-8 py-10 animate-fade-in">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <button
               type="button"
@@ -101,22 +102,6 @@ export default function Projects() {
             </button>
             <h1 className="text-3xl font-semibold text-[#1E1E1E]">Projects</h1>
           </div>
-          <img src={logo} alt="Aramco Digital" className="h-14 md:h-16 w-auto" />
-          <nav>
-            <ul className="flex items-center gap-8 text-[#6B7280] font-medium">
-              {"Home Notification Features About".split(" ").map((item) => (
-                <li key={item} className="hover:opacity-80 transition">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
-
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
-          <p className="text-sm text-[#6B7280]">
-            Keep all saved decks at your fingertips. Select any card to continue where you left off.
-          </p>
           <button
             type="button"
             onClick={() => navigate("/create")}
@@ -125,6 +110,10 @@ export default function Projects() {
             New project
           </button>
         </div>
+
+        <p className="mt-6 text-sm text-[#6B7280] max-w-[520px]">
+          Keep all saved decks at your fingertips. Select any card to continue where you left off.
+        </p>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {displayedProjects.length === 0 ? (
@@ -203,8 +192,8 @@ export default function Projects() {
             })
           )}
         </div>
-      </div>
-    </section>
+      </main>
+    </div>
   );
 }
 
