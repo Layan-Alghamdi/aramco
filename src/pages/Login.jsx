@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import { ensureActiveUserByEmail } from "@/lib/usersStore";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function Login() {
     }
 
     localStorage.setItem("isAuth", "1");
-    localStorage.setItem("userEmail", trimmedEmail);
+    ensureActiveUserByEmail(trimmedEmail);
     setError("");
     navigate("/dashboard");
   };

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { recordProjectForUser } from "@/lib/usersStore";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -25,6 +27,7 @@ const InputLabel = ({ htmlFor, children }) => (
 export default function CreateProject() {
   const navigate = useNavigate();
   const { addProject } = useProjects();
+  const currentUser = useCurrentUser();
 
   const [form, setForm] = useState(() => ({ ...initialFormState }));
   const [saving, setSaving] = useState(false);
@@ -80,13 +83,16 @@ export default function CreateProject() {
 
     try {
       const slides = cloneTemplateSlides(form.templateId);
-      const project = addProject({
+          const project = addProject({
         name: form.name.trim(),
         description: form.description.trim(),
         templateId: form.templateId,
         slides,
-        status: "Draft",
-        owner: "You"
+            status: "Draft",
+            ownerId: currentUser?.id ?? null,
+            ownerName: currentUser?.name ?? "You",
+            ownerEmail: currentUser?.email ?? "",
+            ownerRole: currentUser?.role ?? ""
       });
 
       setSuccessMessage("Project saved successfully.");
@@ -95,6 +101,9 @@ export default function CreateProject() {
       setTimeout(() => {
         navigate(`/editor/${project.id}`, { state: { from: "create", highlightProjectId: project.id } });
       }, 650);
+          if (currentUser?.id) {
+            recordProjectForUser(currentUser.id, project.id);
+          }
     } catch (submitError) {
       console.error("Failed to save project", submitError);
       setError("Something went wrong while saving. Please try again.");

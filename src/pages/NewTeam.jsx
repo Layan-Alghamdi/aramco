@@ -1,19 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import SharedHeader from "@/components/SharedHeader";
 import TeamForm from "@/components/TeamForm";
 import { createTeam } from "@/lib/teamsStore";
-
-const getOwnerEmail = () => {
-  if (typeof window === "undefined") return "you@aramatrix.app";
-  const stored = window.localStorage.getItem("app.ownerEmail");
-  return stored || "you@aramatrix.app";
-};
-
-const storeOwnerEmail = (email) => {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem("app.ownerEmail", email);
-};
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { recordTeamForUser } from "@/lib/usersStore";
 
 const gradientStyle = {
   background:
@@ -29,12 +20,14 @@ const createId = () => {
 
 export default function NewTeam() {
   const navigate = useNavigate();
-  const [ownerEmail] = useState(getOwnerEmail);
+  const user = useCurrentUser();
+  const ownerEmail = user?.email ?? "you@aramatrix.app";
 
   const handleSubmit = ({ name, description, avatarUrl, members }) => {
     const owner = {
-      id: createId(),
+      id: user?.id ?? createId(),
       email: ownerEmail,
+      name: user?.name ?? "Team Owner",
       role: "Owner",
       status: "Active"
     };
@@ -46,9 +39,13 @@ export default function NewTeam() {
       name,
       description,
       avatarUrl,
-      members: [owner, ...invites]
+      members: [owner, ...invites],
+      createdById: owner.id,
+      createdByName: owner.name
     });
-    storeOwnerEmail(owner.email);
+    if (user?.id) {
+      recordTeamForUser(user.id, team.id);
+    }
     navigate(`/teams/${team.id}`, { state: { toast: "Team created" } });
   };
 

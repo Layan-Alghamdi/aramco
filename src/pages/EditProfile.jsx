@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { updateActiveUser } from "@/lib/usersStore";
 
 const initialFormState = {
   name: "",
@@ -10,38 +12,28 @@ const initialFormState = {
   employeeId: ""
 };
 
-const localStorageKeys = {
-  name: "userName",
-  email: "userEmail",
-  department: "userDepartment",
-  role: "userRole",
-  employeeId: "userEmployeeId",
-  avatar: "userAvatar"
-};
-
 const dotPlaceholder = "...........";
 
 export default function EditProfile() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const user = useCurrentUser();
   const [form, setForm] = useState(initialFormState);
   const [avatar, setAvatar] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
+    if (user) {
+      setForm({
+        name: user.name ?? "",
+        email: user.email ?? "",
+        department: user.department ?? "",
+        role: user.role ?? "",
+        employeeId: user.employeeId ?? ""
+      });
+      setAvatar(user.avatarUrl ?? "");
     }
-
-    setForm({
-      name: window.localStorage.getItem(localStorageKeys.name)?.trim() || "",
-      email: window.localStorage.getItem(localStorageKeys.email)?.trim() || "",
-      department: window.localStorage.getItem(localStorageKeys.department)?.trim() || "",
-      role: window.localStorage.getItem(localStorageKeys.role)?.trim() || "",
-      employeeId: window.localStorage.getItem(localStorageKeys.employeeId)?.trim() || ""
-    });
-    setAvatar(window.localStorage.getItem(localStorageKeys.avatar) || "");
-  }, []);
+  }, [user]);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
@@ -68,39 +60,23 @@ export default function EditProfile() {
     reader.readAsDataURL(file);
   };
 
-  const storeValue = (key, value) => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const trimmed = value.trim();
-    if (trimmed) {
-      window.localStorage.setItem(key, trimmed);
-    } else {
-      window.localStorage.removeItem(key);
-    }
-  };
-
   const handleSave = () => {
-    if (typeof window === "undefined" || isSaving) {
+    if (isSaving) {
       return;
     }
-
-    setIsSaving(true);
-
-    storeValue(localStorageKeys.name, form.name);
-    storeValue(localStorageKeys.email, form.email);
-    storeValue(localStorageKeys.department, form.department);
-    storeValue(localStorageKeys.role, form.role);
-    storeValue(localStorageKeys.employeeId, form.employeeId);
-
-    if (avatar) {
-      window.localStorage.setItem(localStorageKeys.avatar, avatar);
-    } else {
-      window.localStorage.removeItem(localStorageKeys.avatar);
+    if (!form.name.trim() || !form.email.trim()) {
+      return;
     }
-
+    setIsSaving(true);
     setTimeout(() => {
+      updateActiveUser({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        department: form.department.trim(),
+        role: form.role.trim(),
+        employeeId: form.employeeId.trim(),
+        avatarUrl: avatar
+      });
       setIsSaving(false);
       navigate("/profile", { replace: true });
     }, 200);

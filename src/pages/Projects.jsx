@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { slideTemplateMap } from "../templates/brandTemplates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -28,8 +29,18 @@ export default function Projects() {
   const navigate = useNavigate();
   const location = useLocation();
   const { projects } = useProjects();
+  const currentUser = useCurrentUser();
 
   const [highlightId, setHighlightId] = useState(null);
+
+  const [activeFilter, setActiveFilter] = useState(location.state?.filter === "mine" ? "mine" : "all");
+
+  useEffect(() => {
+    if (location.state?.filter) {
+      setActiveFilter(location.state.filter);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (location.state?.highlightProjectId) {
@@ -51,6 +62,22 @@ export default function Projects() {
       return bDate - aDate;
     });
   }, [projects]);
+
+  const displayedProjects = useMemo(() => {
+    if (activeFilter !== "mine" || !currentUser) {
+      return orderedProjects;
+    }
+    return orderedProjects.filter((project) => {
+      if (project.ownerId && project.ownerId === currentUser.id) return true;
+      if (project.ownerEmail && currentUser.email) {
+        return project.ownerEmail.toLowerCase() === currentUser.email.toLowerCase();
+      }
+      if (project.ownerName && currentUser.name) {
+        return project.ownerName.toLowerCase() === currentUser.name.toLowerCase();
+      }
+      return false;
+    });
+  }, [orderedProjects, activeFilter, currentUser]);
 
   return (
     <section className="min-h-screen relative font-['Poppins',ui-sans-serif] text-[#1E1E1E]">
@@ -100,13 +127,22 @@ export default function Projects() {
         </div>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {orderedProjects.length === 0 ? (
+          {displayedProjects.length === 0 ? (
             <div className="col-span-full rounded-2xl border-2 border-dashed border-white/60 bg-white/40 px-6 py-12 text-center text-[#6B7280]">
               No projects yet. Create your first presentation to see it appear here.
             </div>
           ) : (
-            orderedProjects.map((project) => {
+            displayedProjects.map((project) => {
               const isHighlighted = highlightId === project.id;
+              const isMine =
+                currentUser &&
+                ((project.ownerId && project.ownerId === currentUser.id) ||
+                  (project.ownerEmail &&
+                    currentUser.email &&
+                    project.ownerEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                  (project.ownerName &&
+                    currentUser.name &&
+                    project.ownerName.toLowerCase() === currentUser.name.toLowerCase()));
               return (
                 <article
                   key={project.id}
@@ -143,7 +179,14 @@ export default function Projects() {
                     {project.description || "No description yet. Add context so teams know the story."}
                   </p>
                   <footer className="mt-5 flex items-center justify-between text-xs text-[#6B7280]">
-                    <span>Owner • {project.owner ?? "You"}</span>
+                    <span className="flex items-center gap-2">
+                      Owner • {project.ownerName ?? project.owner ?? "You"}
+                      {isMine && (
+                        <span className="rounded-full bg-[#3E6DCC]/10 px-2 py-0.5 text-[10px] font-semibold text-[#3E6DCC]">
+                          Mine
+                        </span>
+                      )}
+                    </span>
                     <button
                       type="button"
                       onClick={() => navigate(`/editor/${project.id}`)}

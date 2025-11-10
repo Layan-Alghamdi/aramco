@@ -89,7 +89,13 @@ export default function Editor() {
     left: 0
   });
   const [recentColors, setRecentColors] = useState([]);
-  const [statusText, setStatusText] = useState("All changes saved");
+  const [isOffline, setIsOffline] = useState(typeof window !== "undefined" ? !navigator.onLine : false);
+  const [saveState, setSaveState] = useState("saved");
+  const [lastSavedAt, setLastSavedAt] = useState(() => Date.now());
+  const [pendingChanges, setPendingChanges] = useState(false);
+  const [aiInsights, setAiInsights] = useState({});
+  const [highlightedIssueId, setHighlightedIssueId] = useState(null);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
   const [snapEnabled, setSnapEnabled] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
   const [highlightColor, setHighlightColor] = useState("#FDE68A");
@@ -103,6 +109,15 @@ export default function Editor() {
   const fileInputRef = useRef(null);
   const videoFileInputRef = useRef(null);
   const interactionRef = useRef(interaction);
+  const slidesRef = useRef(slides);
+  const saveTimeoutRef = useRef(null);
+  const hasRestoredPending = useRef(false);
+
+  useEffect(() => {
+    if (isOffline) {
+      setSaveState("offline");
+    }
+  }, [isOffline]);
 
   useEffect(() => {
     interactionRef.current = interaction;
@@ -134,6 +149,224 @@ export default function Editor() {
 
   const hasSelection = selectedObjects.length > 0;
   const selectedObject = selectedObjects[0] ?? null;
+  const pendingStorageKey = useMemo(() => (project ? `pendingSlides_${project.id}` : null), [project]);
+
+  useEffect(() => {
+    slidesRef.current = slides;
+  }, [slides]);
+
+  useEffect(() => {
+    setHighlightedIssueId(null);
+  }, [activeSlideId]);
+  const analyzeSlides = useCallback((slidesList) => {
+    const result = {};
+    slidesList.forEach((slide) => {
+      const objects = slide?.objects ?? [];
+      const issues = [];
+      const texts = objects.filter((obj) => obj.type === "text");
+
+      const clampCoord = (value, min, max) => Math.min(Math.max(value, min), max);
+      const issuePosition = (obj) => ({
+        x: clampCoord(obj.x + obj.w - 22, 10, SLIDE_WIDTH - 30),
+        y: clampCoord(obj.y - 18, 10, SLIDE_HEIGHT - 34)
+      });
+
+      if (texts.length >= 2) {
+        const centers = texts.map((text) => text.x + text.w / 2);
+        const meanCenter = centers.reduce((sum, value) => sum + value, 0) / centers.length;
+        centers.forEach((center, index) => {
+          if (Math.abs(center - meanCenter) > 32) {
+            const obj = texts[index];
+            const pos = issuePosition(obj);
+            issues.push({
+              id: `${slide.id}-${obj.id}-alignment`,
+              objectId: obj.id,
+              message: "Consider aligning this text with the body content for better balance.",
+              ...pos
+            });
+          }
+        });
+
+        const fontCounts = {};
+        texts.forEach((text) => {
+          const font = (text.fontFamily || "Poppins").toLowerCase();
+          fontCounts[font] = (fontCounts[font] || 0) + 1;
+        });
+        const [primaryFont] =
+          Object.entries(fontCounts).sort(([, a], [, b]) => b - a)[0] ?? [];
+        texts.forEach((text) => {
+          const font = (text.fontFamily || "Poppins").toLowerCase();
+          if (primaryFont && font !== primaryFont) {
+            const pos = issuePosition(text);
+            issues.push({
+              id: `${slide.id}-${text.id}-font`,
+              objectId: text.id,
+              message: `Font "${text.fontFamily || "Default"}" differs from other text on this slide.`,
+              ...pos
+            });
+          }
+        });
+      }
+
+      const addedOverlap = new Set();
+      for (let i = 0; i < objects.length; i += 1) {
+        for (let j = i + 1; j < objects.length; j += 1) {
+          const a = objects[i];
+          const b = objects[j];
+          const left = Math.max(a.x, b.x);
+          const right = Math.min(a.x + a.w, b.x + b.w);
+          const top = Math.max(a.y, b.y);
+          const bottom = Math.min(a.y + a.h, b.y + b.h);
+          const overlapW = right - left;
+          const overlapH = bottom - top;
+          if (overlapW > 0 && overlapH > 0) {
+            const overlapArea = overlapW * overlapH;
+            const smallerArea = Math.min(a.w * a.h, b.w * b.h);
+            if (overlapArea > smallerArea * 0.2) {
+              const keyA = `${slide.id}-${a.id}-overlap-${b.id}`;
+              const keyB = `${slide.id}-${b.id}-overlap-${a.id}`;
+              if (!addedOverlap.has(keyA)) {
+                const posA = issuePosition(a);
+                issues.push({
+                  id: keyA,
+                  objectId: a.id,
+                  message: "These elements overlap. Try spacing them apart.",
+                  ...posA
+                });
+                addedOverlap.add(keyA);
+              }
+              if (!addedOverlap.has(keyB)) {
+                const posB = issuePosition(b);
+                issues.push({
+                  id: keyB,
+                  objectId: b.id,
+                  message: "These elements overlap. Try spacing them apart.",
+                  ...posB
+                });
+                addedOverlap.add(keyB);
+              }
+            }
+          }
+        }
+      }
+
+      const colorValues = new Set();
+      objects.forEach((object) => {
+        const color = (object.type === "text" ? object.color : object.fill) ?? null;
+        if (color) {
+          colorValues.add(color.toLowerCase());
+        }
+      });
+      if (colorValues.size > 6) {
+        issues.push({
+          id: `${slide.id}-palette`,
+          objectId: null,
+          message: "This slide uses many colors—consider simplifying the palette.",
+          x: 20,
+          y: 20
+        });
+      }
+
+      result[slide.id] = issues;
+    });
+    return result;
+  }, []);
+
+  useEffect(() => {
+    setAiInsights(analyzeSlides(slides));
+  }, [slides, analyzeSlides]);
+
+  const generateAiSuggestions = useCallback(() => {
+    if (!activeSlide) return [];
+    const suggestions = [];
+    const objects = activeSlide.objects ?? [];
+    const textObjects = objects.filter((object) => object.type === "text");
+    const combinedText = textObjects.map((text) => text.text || "").join(" ");
+    const wordCount = combinedText.split(/\s+/).filter(Boolean).length;
+
+    if (textObjects.length >= 3 && wordCount > 120) {
+      suggestions.push({
+        id: `${activeSlide.id}-layout`,
+        category: "Layout",
+        message: "Try a two-column layout to improve readability."
+      });
+    }
+
+    if (textObjects.length > 0) {
+      const titleCandidate = [...textObjects].sort((a, b) => a.y - b.y)[0];
+      if (titleCandidate && (titleCandidate.text || "").length >= 12) {
+        const original = titleCandidate.text.trim();
+        const alternative =
+          original.slice(0, 1).toUpperCase() +
+          original
+            .slice(1)
+            .replace(/202(\d)/, "20$10+")
+            .replace(/report/i, "insights")
+            .replace(/analysis/i, "blueprint");
+        if (alternative && alternative !== original) {
+          suggestions.push({
+            id: `${activeSlide.id}-title`,
+            category: "Headline",
+            message: `Try a more action-oriented title, e.g., “${alternative}”.`
+          });
+        }
+      }
+    }
+
+    const keywordText = combinedText.toLowerCase();
+    if (/\b(ai|automation|machine learning|digital)\b/.test(keywordText)) {
+      suggestions.push({
+        id: `${activeSlide.id}-visuals`,
+        category: "Visual",
+        message: "Add an AI-themed illustration or icon to reinforce the message."
+      });
+    } else if (/\bfinance|growth|sales|report|strategy\b/.test(keywordText)) {
+      suggestions.push({
+        id: `${activeSlide.id}-visuals-generic`,
+        category: "Visual",
+        message: "Consider adding supporting icons or charts that match the topic."
+      });
+    }
+
+    if (objects.length >= 4 && objects.some((object) => object.type === "shape")) {
+      suggestions.push({
+        id: `${activeSlide.id}-animation`,
+        category: "Motion",
+        message: "Use subtle entrance animations to reveal each element in sequence."
+      });
+    }
+
+    if (suggestions.length === 0) {
+      suggestions.push({
+        id: `${activeSlide.id}-no-suggestions`,
+        category: "Ideas",
+        message: "This slide looks balanced. Try adding a supporting quote or statistic."
+      });
+    }
+
+    return suggestions;
+  }, [activeSlide]);
+
+  useEffect(() => {
+    setAiSuggestions(generateAiSuggestions());
+  }, [generateAiSuggestions]);
+
+  useEffect(() => {
+    if (!pendingStorageKey || hasRestoredPending.current || typeof window === "undefined") return;
+    const cached = localStorage.getItem(pendingStorageKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed?.slides) {
+          setSlides(parsed.slides);
+        }
+      } catch (error) {
+        console.warn("Unable to restore cached slides", error);
+      }
+    }
+    hasRestoredPending.current = true;
+  }, [pendingStorageKey]);
+
 
   const computeNextZIndex = useCallback(() => {
     let max = 0;
@@ -149,6 +382,55 @@ export default function Editor() {
     interactionRef.current = payload;
     setInteraction(payload);
   }, []);
+
+  const cachePendingSlides = useCallback(() => {
+    if (!pendingStorageKey || typeof window === "undefined") return;
+    try {
+      localStorage.setItem(
+        pendingStorageKey,
+        JSON.stringify({ slides: slidesRef.current, updatedAt: Date.now() })
+      );
+    } catch (error) {
+      console.warn("Unable to cache pending slides", error);
+    }
+  }, [pendingStorageKey]);
+
+  const clearPendingSlides = useCallback(() => {
+    if (!pendingStorageKey || typeof window === "undefined") return;
+    try {
+      localStorage.removeItem(pendingStorageKey);
+    } catch (error) {
+      console.warn("Unable to clear pending slides", error);
+    }
+  }, [pendingStorageKey]);
+
+  const performSave = useCallback(() => {
+    if (!project || isOffline) return;
+    setSaveState("saving");
+    updateProject(project.id, {
+      slides: slidesRef.current,
+      updatedAt: new Date().toISOString()
+    });
+    setLastSavedAt(Date.now());
+    setPendingChanges(false);
+    setSaveState("saved");
+    clearPendingSlides();
+    saveTimeoutRef.current = null;
+  }, [project, isOffline, updateProject, clearPendingSlides]);
+
+  const scheduleSave = useCallback(
+    (immediate = false) => {
+      if (isOffline) return;
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      setSaveState("saving");
+      saveTimeoutRef.current = window.setTimeout(() => {
+        performSave();
+      }, immediate ? 0 : 600);
+    },
+    [isOffline, performSave]
+  );
 
   const updateObject = useCallback(
     (objectId, updater) => {
@@ -195,7 +477,6 @@ export default function Editor() {
 
       replaceObjectsForSlide(activeSlide.id, (objects) => [...objects, newObject]);
       setSelectedIds([newObject.id]);
-      setStatusText("Saving…");
     },
     [activeSlide, computeNextZIndex, replaceObjectsForSlide]
   );
@@ -205,7 +486,6 @@ export default function Editor() {
       if (!objectId || !activeSlide) return;
       replaceObjectsForSlide(activeSlide.id, (objects) => objects.filter((object) => object.id !== objectId));
       setSelectedIds([]);
-      setStatusText("Saving…");
     },
     [activeSlide, replaceObjectsForSlide]
   );
@@ -660,8 +940,74 @@ export default function Editor() {
   };
 
   const handleAiAssist = () => {
-    setStatusText("AI assistant (coming soon)");
+    window.alert("AI layout suggestions are coming soon.");
   };
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!project) return;
+    setPendingChanges(true);
+    if (isOffline) {
+      cachePendingSlides();
+    } else {
+      setSaveState("saving");
+      scheduleSave();
+    }
+  }, [slides, project, isOffline, cachePendingSlides, scheduleSave]);
+
+  useEffect(() => {
+    if (isOffline) return;
+    const interval = window.setInterval(() => {
+      if (pendingChanges) {
+        scheduleSave(true);
+      }
+    }, 10000);
+    return () => window.clearInterval(interval);
+  }, [pendingChanges, isOffline, scheduleSave]);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      if (!pendingStorageKey || typeof window === "undefined") return;
+      const cached = localStorage.getItem(pendingStorageKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed?.slides) {
+            setSlides(parsed.slides);
+            clearPendingSlides();
+            setPendingChanges(true);
+            scheduleSave(true);
+          }
+        } catch (error) {
+          console.warn("Unable to restore pending slides", error);
+        }
+      } else {
+        scheduleSave(true);
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOffline(true);
+      setSaveState("offline");
+      cachePendingSlides();
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [cachePendingSlides, clearPendingSlides, pendingStorageKey, scheduleSave]);
 
   useEffect(() => {
     const handleKeyDelete = (event) => {
@@ -686,6 +1032,33 @@ export default function Editor() {
     </div>
   );
 
+  const relativeLastSaved = useMemo(() => {
+    const now = Date.now();
+    const delta = now - lastSavedAt;
+    if (!lastSavedAt) return "never";
+    if (delta < 5000) return "just now";
+    if (delta < 60000) return `${Math.floor(delta / 1000)} seconds ago`;
+    if (delta < 3600000) {
+      const minutes = Math.floor(delta / 60000);
+      return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    }
+    const hours = Math.floor(delta / 3600000);
+    return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  }, [lastSavedAt]);
+
+  const statusMeta = useMemo(() => {
+    if (isOffline) {
+      return {
+        icon: "⚠️",
+        label: pendingChanges ? "Offline – changes pending sync" : "Offline"
+      };
+    }
+    if (saveState === "saving") {
+      return { icon: "🌀", label: "Saving..." };
+    }
+    return { icon: "✅", label: "All changes saved" };
+  }, [isOffline, pendingChanges, saveState]);
+
   const currentFontSize = selectedTextObject?.fontSize ?? DEFAULT_TEXT_PROPS.fontSize;
   const currentBold = (selectedTextObject?.fontWeight ?? DEFAULT_TEXT_PROPS.fontWeight) >= 600;
   const currentItalic = selectedTextObject?.italic ?? DEFAULT_TEXT_PROPS.italic;
@@ -694,22 +1067,11 @@ export default function Editor() {
   const currentColor = selectedTextObject?.color ?? DEFAULT_TEXT_PROPS.color;
   const currentLineHeight = selectedTextObject?.lineHeight ?? DEFAULT_TEXT_PROPS.lineHeight;
 
-  useEffect(() => {
-    if (!project) return;
-    setStatusText("Saving…");
-    const timeout = setTimeout(() => {
-      updateProject(project.id, { slides });
-      setStatusText("All changes saved");
-    }, 600);
-    return () => clearTimeout(timeout);
-  }, [slides, project, updateProject]);
-
   const addSlideFromTemplate = (templateId) => {
     const [templateSlide] = cloneTemplateSlides(templateId);
     if (!templateSlide) return;
     setSlides((prev) => [...prev, templateSlide]);
     setActiveSlideId(templateSlide.id);
-    setStatusText("Saving…");
   };
 
   const addBlankSlide = () => {
@@ -721,14 +1083,13 @@ export default function Editor() {
   const deleteSlide = (id) => {
     setSlides((prev) => {
       if (prev.length <= 1) {
-        setStatusText("Cannot delete the last slide");
+        window.alert("Cannot delete the last slide");
         return prev;
       }
       const filtered = prev.filter((slide) => slide.id !== id);
       if (activeSlideId === id) {
         setActiveSlideId(filtered[filtered.length - 1]?.id ?? filtered[0]?.id ?? null);
       }
-      setStatusText("Saving…");
       return filtered;
     });
   };
@@ -789,7 +1150,13 @@ export default function Editor() {
           </div>
           <img src={logo} alt="Aramco Digital" className="h-12 md:h-14 w-auto" />
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#6B7280]">{statusText}</span>
+            <div
+              className="flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-[#1E1E1E] shadow-sm"
+              title={`Last saved: ${relativeLastSaved}`}
+            >
+              <span>{statusMeta.icon}</span>
+              <span>{statusMeta.label}</span>
+            </div>
             <button
               ref={colorButtonRef}
               type="button"
@@ -1219,6 +1586,31 @@ export default function Editor() {
                     );
                   })}
 
+                  {aiInsights[activeSlide?.id]?.map((issue) => {
+                    const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
+                    const x = clampValue(issue.x ?? 20, 8, SLIDE_WIDTH - 28);
+                    const y = clampValue(issue.y ?? 20, 8, SLIDE_HEIGHT - 28);
+                    return (
+                      <button
+                        type="button"
+                        key={issue.id}
+                        aria-label="AI suggestion"
+                        onClick={() =>
+                          setHighlightedIssueId((current) => (current === issue.id ? null : issue.id))
+                        }
+                        className="absolute flex h-6 w-6 items-center justify-center rounded-full bg-[#FBBF24] text-[11px] text-[#1B1533] shadow pointer-events-auto"
+                        style={{ left: x, top: y }}
+                      >
+                        ⚠️
+                        {highlightedIssueId === issue.id && (
+                          <div className="absolute left-1/2 top-full mt-2 w-48 -translate-x-1/2 rounded-lg bg-[#1B1533] px-3 py-2 text-xs text-white shadow-lg">
+                            {issue.message}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+
                   {(!activeSlide || activeSlide.objects.length === 0) && (
                     <div className="absolute inset-0 flex items-center justify-center text-base text-[#93A3C3]">
                       Double-click anywhere to add your story. Use templates to accelerate content blocks.
@@ -1409,6 +1801,26 @@ export default function Editor() {
                       </div>
                     </div>
                   </button>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide mb-3">AI Suggestions</h3>
+              <div className="space-y-2 text-xs text-[#374151]">
+                {aiSuggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.id}
+                    className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2 shadow-sm flex flex-col gap-1"
+                  >
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-[#3E6DCC]">
+                      {suggestion.category}
+                    </span>
+                    <span className="flex items-start gap-2 text-[13px] leading-relaxed">
+                      <span className="text-base leading-none pt-[2px]">✨</span>
+                      {suggestion.message}
+                    </span>
+                  </div>
                 ))}
               </div>
             </section>

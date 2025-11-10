@@ -43,6 +43,8 @@ export function createTeam(input) {
     description: input.description?.trim() || "",
     avatarUrl: input.avatarUrl || "",
     members: input.members ?? [],
+    createdById: input.createdById || null,
+    createdByName: input.createdByName || "",
     createdAt: now,
     updatedAt: now
   };
