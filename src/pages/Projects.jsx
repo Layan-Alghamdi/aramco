@@ -85,7 +85,7 @@ export default function Projects() {
 
   return (
     <div className="min-h-screen" style={backgroundGradient}>
-      <SharedHeader variant="dashboard" />
+      <SharedHeader variant="dashboard" height="110px" />
       <main className="relative z-10 flex min-h-screen flex-col px-8 py-10 animate-fade-in">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
