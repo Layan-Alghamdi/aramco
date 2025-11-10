@@ -30,6 +30,7 @@ export default function Login() {
 
     localStorage.setItem("isAuth", "1");
     localStorage.setItem("userEmail", trimmedEmail);
+    localStorage.setItem("userPassword", trimmedPassword);
     setError("");
     navigate("/dashboard");
   };
