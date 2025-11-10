@@ -7,7 +7,7 @@ export default function Home() {
     <div className="min-h-screen bg-[radial-gradient(circle_at_20%_20%,#00A98E_0%,#2B7AC8_100%)]">
       <SharedHeader variant="dashboard" />
       <main className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10">
-        <section className="relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08)] overflow-hidden">
+        <section className="relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08),0_0_30px_rgba(0,150,255,0.2)] overflow-hidden">
           <div className="relative grid lg:grid-cols-2 items-center">
             <div className="p-10 md:p-14">
               <h1 className="text-[#0A0A0A] font-extrabold tracking-tight leading-tight text-[40px] md:text-[56px] max-w-[520px]">
