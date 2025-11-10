@@ -244,8 +244,7 @@ export default function Profile() {
                         <li key={template.id} className="rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm">
                           <p className="text-sm font-semibold text-[#1F2937]">{template.name}</p>
                           <p className="text-xs text-[#6B7280]">
-                            {template.category} • Updated{" "}
-                            {new Date(template.updatedAt ?? Date.now()).toLocaleDateString()}
+                            {template.category} • Updated {new Date(template.updatedAt ?? Date.now()).toLocaleDateString()}
                           </p>
                         </li>
                       ))}
@@ -275,8 +274,7 @@ export default function Profile() {
                       <li key={team.id} className="rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm flex flex-col gap-2">
                         <span className="text-sm font-semibold text-[#1F2937]">{team.name}</span>
                         <p className="text-xs text-[#6B7280]">
-                          {team.members?.length ?? 0} members • Created{" "}
-                          {new Date(team.createdAt ?? Date.now()).toLocaleDateString()}
+                          {team.members?.length ?? 0} members • Created {new Date(team.createdAt ?? Date.now()).toLocaleDateString()}
                         </p>
                         <button
                           type="button"

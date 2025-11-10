@@ -47,23 +47,19 @@ export default function Login() {
           }}
         />
 
-        {/* centered card area */}
         <div className="relative z-10 grid place-items-center py-16">
           <div className="w-[88%] md:w-[68%] lg:w-[54%]">
             <div className="mx-auto max-w-[560px] rounded-[22px] border border-[#C9CED6] bg-white/70 backdrop-blur-[2px] px-6 py-8 md:px-10 md:py-12 shadow-[0_2px_0_rgba(0,0,0,0.03),0_8px_24px_rgba(0,0,0,0.06)]">
-              {/* Centered header row: title + logo */}
               <div className="w-full flex items-center justify-between mb-8 px-2 md:px-4">
                 <h1 className="text-[32px] md:text-[44px] font-extrabold tracking-tight text-[#0A0A0A] m-0">Log in</h1>
                 <img src={logo} alt="Aramco Digital" className="h-16 md:h-20 w-auto translate-x-3 md:translate-x-4" />
               </div>
 
-              {/* inputs */}
               <div className="space-y-4 mb-6">
-                {/* email */}
                 <label className="sr-only" htmlFor="email">User Email</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 grid place-items-center w-8 h-8 rounded-full bg-[#EFEFEF] text-[#1f2937]">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 3.134-7 7h2a5 5 0 0 1 10 0h2c0-3.866-3.134-7-7-7z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 3.134-7 7h2a5 5 0 0 1 10 0h2c0-3.866-3.134-7-7-7z" /></svg>
                   </span>
                   <input
                     id="email"
@@ -75,11 +71,10 @@ export default function Login() {
                   />
                 </div>
 
-                {/* password */}
                 <label className="sr-only" htmlFor="password">Password</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 grid place-items-center w-8 h-8 rounded-full bg-[#EFEFEF] text-[#1f2937]">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2Zm-6 8.732V17a1 1 0 1 1 2 0v-.268a2 2 0 1 1-2 0ZM9 8V6a3 3 0 0 1 6 0v2H9Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8h-1V6a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2Zm-6 8.732V17a1 1 0 1 1 2 0v-.268a2 2 0 1 1-2 0ZM9 8V6a3 3 0 0 1 6 0v2H9Z" /></svg>
                   </span>
                   <input
                     id="password"
@@ -104,7 +99,6 @@ export default function Login() {
             </div>
           </div>
         </div>
-        
       </div>
     </section>
   );

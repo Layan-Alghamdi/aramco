@@ -83,16 +83,16 @@ export default function CreateProject() {
 
     try {
       const slides = cloneTemplateSlides(form.templateId);
-          const project = addProject({
+      const project = addProject({
         name: form.name.trim(),
         description: form.description.trim(),
         templateId: form.templateId,
         slides,
-            status: "Draft",
-            ownerId: currentUser?.id ?? null,
-            ownerName: currentUser?.name ?? "You",
-            ownerEmail: currentUser?.email ?? "",
-            ownerRole: currentUser?.role ?? ""
+        status: "Draft",
+        ownerId: currentUser?.id ?? null,
+        ownerName: currentUser?.name ?? "You",
+        ownerEmail: currentUser?.email ?? "",
+        ownerRole: currentUser?.role ?? ""
       });
 
       setSuccessMessage("Project saved successfully.");
@@ -101,9 +101,10 @@ export default function CreateProject() {
       setTimeout(() => {
         navigate(`/editor/${project.id}`, { state: { from: "create", highlightProjectId: project.id } });
       }, 650);
-          if (currentUser?.id) {
-            recordProjectForUser(currentUser.id, project.id);
-          }
+
+      if (currentUser?.id) {
+        recordProjectForUser(currentUser.id, project.id);
+      }
     } catch (submitError) {
       console.error("Failed to save project", submitError);
       setError("Something went wrong while saving. Please try again.");
