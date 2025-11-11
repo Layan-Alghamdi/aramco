@@ -10,7 +10,7 @@ export default function Home() {
         <section className="relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08),0_0_30px_rgba(0,150,255,0.2)] overflow-hidden">
           <div className="relative grid lg:grid-cols-2 items-center">
             <div className="p-10 md:p-14">
-              <h1 className="text-black font-extrabold tracking-tight text-[3rem] leading-[1.1] max-w-[680px]">
+              <h1 className="text-black font-extrabold tracking-tight text-[3rem] leading-[1.15] max-w-[700px]">
                 Aramatrix – Create AI-Powered
                 <br />
                 Presentations Instantly
