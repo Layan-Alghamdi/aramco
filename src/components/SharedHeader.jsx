@@ -143,23 +143,18 @@ function UserMenu() {
   );
 }
 
-export default function SharedHeader({ variant = "default", height }) {
+export default function SharedHeader({ variant = "default" }) {
   const isDashboard = variant === "dashboard";
   const wrapperClasses = `${isDashboard ? "mb-6" : "mb-8 md:mb-10"}`;
-  const barClassName = `w-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]`;
-  const barStyle = {
-    height: height ?? (isDashboard ? "70px" : undefined)
-  };
+  const barClasses = `w-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)] ${isDashboard ? "h-[70px]" : ""}`;
   const innerClasses = `mx-auto flex items-center justify-between ${isDashboard ? "px-6 md:px-10" : "px-6"}`;
 
   return (
     <header className={wrapperClasses}>
-      <nav className={barClassName} style={barStyle}>
+      <nav className={barClasses}>
         <div className={innerClasses}>
           <div className="flex items-center" style={{ paddingLeft: isDashboard ? "24px" : "0" }}>
-            <Link to="/">
-              <img src={logo} alt="Aramco Digital" className={isDashboard ? "h-12" : "h-16"} />
-            </Link>
+            <Link to="/"><img src={logo} alt="Aramco Digital" className={isDashboard ? "h-12" : "h-16"} /></Link>
           </div>
           <div className="hidden md:flex flex-1 justify-center">
             <ul className="flex items-center gap-8 font-[500] text-[16px] text-[#1E1E1E]">
