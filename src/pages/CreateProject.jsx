@@ -121,8 +121,8 @@ export default function CreateProject() {
   return (
     <div className="min-h-screen" style={backgroundStyle}>
       <SharedHeader variant="dashboard" />
-      <section className="min-h-screen relative font-['Poppins',ui-sans-serif] text-[#1E1E1E] pt-24 px-8 pb-10 animate-fade-in">
-        <div className="flex flex-col gap-6">
+      <section className="min-h-screen relative font-['Poppins',ui-sans-serif] text-[#1E1E1E] pt-20 px-8 pb-10 animate-fade-in">
+        <div className="flex flex-col gap-4">
           <header className="flex items-center justify-between">
             <button
               type="button"
