@@ -5,7 +5,7 @@ import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordProjectForUser } from "@/lib/usersStore";
-import SharedHeader from "../SharedHeader";
+import SharedHeader from "@/components/SharedHeader";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
