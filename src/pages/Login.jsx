@@ -41,10 +41,7 @@ export default function Login() {
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)'
-          }}
+          style={{ background: "#FFFFFF" }}
         />
 
         <div className="relative z-10 grid place-items-center py-16">
