@@ -10,12 +10,11 @@ export default function Home() {
         <section className="relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08),0_0_30px_rgba(0,150,255,0.2)] overflow-hidden">
           <div className="relative grid lg:grid-cols-2 items-center">
             <div className="p-10 md:p-14">
-              <h1 className="text-black font-extrabold tracking-tight text-[3rem] leading-[1.15] max-w-[700px]">
-                Aramatrix – Create AI-Powered
-                <br />
-                Presentations Instantly
+              <h1 className="text-black font-extrabold tracking-tight leading-tight space-y-2">
+                <span className="block text-[2.75rem] sm:text-6xl lg:text-7xl">Aramatrix</span>
+                <span className="block text-2xl sm:text-3xl lg:text-4xl">Create AI-Powered Presentations Instantly</span>
               </h1>
-              <p className="mt-5 max-w-[560px] text-[18px] md:text-[20px] leading-relaxed text-[#4B5563]">
+              <p className="mt-6 max-w-[560px] text-[18px] md:text-[20px] leading-relaxed text-[#4B5563]">
                 Design smart slides, maintain brand consistency, and collaborate in real-time — no design skills required.
               </p>
 
