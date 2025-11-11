@@ -111,7 +111,7 @@ export default function Projects() {
           </button>
         </div>
 
-        <p className="mt-6 text-sm text-[#6B7280] max-w-[520px]">
+        <p className="mt-6 text-sm text-black max-w-[520px]">
           Keep all saved decks at your fingertips. Select any card to continue where you left off.
         </p>
 
