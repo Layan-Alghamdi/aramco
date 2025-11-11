@@ -121,8 +121,8 @@ export default function CreateProject() {
   return (
     <div className="min-h-screen" style={backgroundStyle}>
       <SharedHeader variant="dashboard" />
-      <section className="min-h-screen relative font-['Poppins',ui-sans-serif] text-[#1E1E1E] pt-16 px-8 pb-10 animate-fade-in">
-        <div className="flex flex-col gap-4">
+      <section className="min-h-screen relative font-['Poppins',ui-sans-serif] text-[#1E1E1E] pt-[72px] px-8 pb-10 animate-fade-in">
+        <div className="flex flex-col gap-2">
           <header className="flex items-center justify-between">
             <button
               type="button"
@@ -137,7 +137,7 @@ export default function CreateProject() {
             </button>
           </header>
 
-          <div className="mt-12 mx-auto w-full max-w-4xl rounded-[30px] bg-white/80 backdrop-blur-lg p-10 shadow-[0_24px_50px_rgba(62,109,204,0.20)] border border-white/50">
+          <div className="mt-8 mx-auto w-full max-w-4xl rounded-[30px] bg-white/80 backdrop-blur-lg p-10 shadow-[0_24px_50px_rgba(62,109,204,0.20)] border border-white/50">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
               <div>
                 <h1 className="text-3xl font-semibold text-[#1E1E1E]">Create a project</h1>
