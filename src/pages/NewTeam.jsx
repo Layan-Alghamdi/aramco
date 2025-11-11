@@ -6,9 +6,8 @@ import { createTeam } from "@/lib/teamsStore";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordTeamForUser } from "@/lib/usersStore";
 
-const gradientStyle = {
-  background:
-    "radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)"
+const containerStyle = {
+  background: "#FFFFFF"
 };
 
 const createId = () => {
@@ -53,8 +52,8 @@ export default function NewTeam() {
     <>
       <SharedHeader />
       <main className="mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20">
-        <section className="relative overflow-hidden rounded-[28px] min-h-[520px]">
-          <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={gradientStyle} />
+        <section className="relative overflow-hidden rounded-[28px] min-h-[520px]" style={containerStyle}>
+          <div aria-hidden="true" className="absolute inset-0 pointer-events-none" />
           <div className="relative z-10 flex justify-center px-6 py-10 md:px-14">
             <div className="w-full max-w-[640px]">
               <h1 className="text-3xl font-extrabold text-[#0A0A0A]">Create a new team</h1>
