@@ -7,8 +7,7 @@ import useTeams from "@/hooks/useTeams";
 import { deleteTeam, updateTeam } from "@/lib/teamsStore";
 
 const gradientStyle = {
-  background:
-    "radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)"
+  background: "#FFFFFF"
 };
 
 const formatDate = (iso) => {
