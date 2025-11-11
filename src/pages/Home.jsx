@@ -14,7 +14,7 @@ export default function Home() {
                 <span className="block text-[2.75rem] sm:text-6xl lg:text-7xl">Aramatrix</span>
                 <span className="block text-2xl sm:text-3xl lg:text-4xl">Create AI-Powered Presentations Instantly</span>
               </h1>
-              <p className="mt-6 max-w-[560px] text-[18px] md:text-[20px] leading-relaxed text-[#4B5563]">
+              <p className="mt-6 max-w-[560px] text-sm sm:text-base leading-relaxed text-gray-500">
                 Design smart slides, maintain brand consistency, and collaborate in real-time — no design skills required.
               </p>
 
