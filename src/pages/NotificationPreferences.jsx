@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 
 const gradientBackground =
-  "radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)";
+  "#FFFFFF";
 
 const defaultPreferences = {
   email: true,
