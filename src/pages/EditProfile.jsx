@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { updateActiveUser } from "@/lib/usersStore";
+import useThemeMode from "@/hooks/useThemeMode";
 
 const initialFormState = {
   name: "",
@@ -21,6 +22,7 @@ export default function EditProfile() {
   const [form, setForm] = useState(initialFormState);
   const [avatar, setAvatar] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const themeMode = useThemeMode();
 
   const placeholderInitial = (form.name?.trim()?.[0] ?? "A").toUpperCase();
 
@@ -36,6 +38,22 @@ export default function EditProfile() {
       setAvatar(user.avatarUrl ?? "");
     }
   }, [user]);
+
+  useEffect(() => {
+    document.body.classList.add("edit-profile-surface");
+    return () => {
+      document.body.classList.remove("edit-profile-surface");
+      document.body.classList.remove("dark-edit-profile");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (themeMode === "dark") {
+      document.body.classList.add("dark-edit-profile");
+    } else {
+      document.body.classList.remove("dark-edit-profile");
+    }
+  }, [themeMode]);
 
   const handleInputChange = (field) => (event) => {
     const value = event.target.value;
@@ -89,21 +107,21 @@ export default function EditProfile() {
   };
 
   return (
-    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
-      <div className="relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
+    <section className="edit-profile-shell min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
+      <div className="edit-profile-frame relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="edit-profile-overlay absolute inset-0 pointer-events-none"
           style={{ background: "#FFFFFF" }}
         />
 
-        <div className="relative z-10 flex h-full flex-col px-10 pt-8 pb-12">
-          <header className="flex items-center justify-between">
+        <div className="edit-profile-frame-inner relative z-10 flex h-full flex-col px-10 pt-8 pb-12">
+          <header className="edit-profile-header flex items-center justify-between">
             <img src={logo} alt="Aramco Digital" className="h-14 md:h-16 w-auto" />
             <button
               type="button"
               onClick={handleCancel}
-              className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-[#1F2937] shadow-sm transition hover:bg-white"
+              className="edit-profile-back inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-[#1F2937] shadow-sm transition hover:bg-white"
             >
               <span aria-hidden="true">‹</span>
               Back
@@ -111,18 +129,18 @@ export default function EditProfile() {
           </header>
 
           <div className="flex-1 flex items-center justify-center py-10">
-            <div className="w-full max-w-[640px]">
-              <section className="rounded-[26px] border border-white/70 bg-white/85 backdrop-blur-sm px-10 py-10 shadow-[0_20px_45px_rgba(31,41,55,0.08)]">
+            <div className="edit-profile-form w-full max-w-[640px]">
+              <section className="edit-profile-card rounded-[26px] border border-white/70 bg-white/85 backdrop-blur-sm px-10 py-10 shadow-[0_20px_45px_rgba(31,41,55,0.08)]">
                 <div className="flex flex-col items-center gap-8 text-center">
                   <button
                     type="button"
                     onClick={handleAvatarClick}
-                    className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/70 shadow-lg group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3B82F6] focus:ring-offset-transparent"
+                    className="edit-profile-avatar relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/70 shadow-lg group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3B82F6] focus:ring-offset-transparent"
                   >
                     {avatar ? (
-                      <img src={avatar} alt="Profile avatar preview" className="w-full h-full object-cover" />
+                      <img src={avatar} alt="Profile avatar preview" className="edit-profile-avatar-image w-full h-full object-cover" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-white text-3xl font-semibold text-[#1A1A1A]">
+                      <div className="edit-profile-avatar-placeholder flex h-full w-full items-center justify-center bg-white text-3xl font-semibold text-[#1A1A1A]">
                         {placeholderInitial}
                       </div>
                     )}
@@ -175,7 +193,7 @@ export default function EditProfile() {
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="w-full sm:w-40 rounded-full border border-[#E5E7EB] bg-white px-6 py-3 text-sm font-semibold text-[#374151] shadow-sm transition hover:bg-[#F3F4F6]"
+                      className="edit-profile-cancel w-full sm:w-40 rounded-full border border-[#E5E7EB] bg-white px-6 py-3 text-sm font-semibold text-[#374151] shadow-sm transition hover:bg-[#F3F4F6]"
                     >
                       Cancel
                     </button>
@@ -183,7 +201,7 @@ export default function EditProfile() {
                       type="button"
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="w-full sm:w-40 rounded-full bg-gradient-to-r from-[#2563EB] via-[#3B82F6] to-[#1D4ED8] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:opacity-70"
+                      className="edit-profile-save w-full sm:w-40 rounded-full bg-gradient-to-r from-[#2563EB] via-[#3B82F6] to-[#1D4ED8] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:opacity-70"
                     >
                       {isSaving ? "Saving..." : "Save"}
                     </button>
@@ -200,14 +218,14 @@ export default function EditProfile() {
 
 function Field({ label, value, onChange, placeholder }) {
   return (
-    <label className="block space-y-2">
-      <span className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">{label}</span>
+    <label className="edit-profile-field block space-y-2">
+      <span className="edit-profile-label text-xs font-semibold uppercase tracking-widest text-[#6B7280]">{label}</span>
       <input
+        className="edit-profile-input w-full h-12 rounded-full border border-[#E5E7EB] bg-white px-5 text-base text-[#111827] shadow-sm placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent transition"
         type="text"
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full h-12 rounded-full border border-[#E5E7EB] bg-white px-5 text-base text-[#111827] shadow-sm placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent transition"
       />
     </label>
   );

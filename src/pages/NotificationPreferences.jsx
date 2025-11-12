@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
+import useThemeMode from "@/hooks/useThemeMode";
 
 const gradientBackground =
   "#FFFFFF";
@@ -44,10 +45,28 @@ export default function NotificationPreferences() {
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const themeMode = useThemeMode();
+  const isDark = themeMode === "dark";
 
   useEffect(() => {
     setPreferences(loadPreferences());
   }, []);
+
+  useEffect(() => {
+    document.body.classList.add("notification-preferences-surface");
+    return () => {
+      document.body.classList.remove("notification-preferences-surface");
+      document.body.classList.remove("dark-notification-preferences");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isDark) {
+      document.body.classList.add("dark-notification-preferences");
+    } else {
+      document.body.classList.remove("dark-notification-preferences");
+    }
+  }, [isDark]);
 
   const channelToggles = useMemo(
     () => [
@@ -126,19 +145,19 @@ export default function NotificationPreferences() {
   };
 
   const renderToggleRow = ({ key, label }, checked, onToggle) => (
-    <div className="flex items-center justify-between rounded-[20px] bg-white/80 px-4 py-3 shadow-[0_6px_20px_rgba(15,23,42,0.08)]" key={key}>
-      <span className="text-base font-semibold text-[#111827]">{label}</span>
+    <div className="notification-preferences-row flex items-center justify-between rounded-[20px] bg-white/80 px-4 py-3 shadow-[0_6px_20px_rgba(15,23,42,0.08)]" key={key}>
+      <span className="notification-preferences-row-label text-base font-semibold text-[#111827]">{label}</span>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
         onClick={() => onToggle(key)}
-        className={`relative inline-flex h-8 w-14 items-center rounded-full transition ${
-          checked ? "bg-[#2563EB]" : "bg-[#CBD5F5]"
+        className={`notification-preferences-toggle relative inline-flex h-8 w-14 items-center rounded-full transition ${
+          checked ? "notification-preferences-toggle--on" : "notification-preferences-toggle--off"
         }`}
       >
         <span
-          className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition ${
+          className={`notification-preferences-handle inline-block h-6 w-6 transform rounded-full bg-white shadow transition ${
             checked ? "translate-x-6" : "translate-x-1"
           }`}
         />
@@ -148,21 +167,24 @@ export default function NotificationPreferences() {
   );
 
   return (
-    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
-      <div className="relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
+    <section
+      className="notification-preferences-shell min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]"
+      style={isDark ? undefined : { background: gradientBackground }}
+    >
+      <div className="notification-preferences-frame relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="notification-preferences-overlay absolute inset-0 pointer-events-none"
           style={{ background: gradientBackground }}
         />
 
-        <div className="relative z-10 flex h-full flex-col px-10 pt-8 pb-12">
-          <header className="flex items-center justify-between">
+        <div className="notification-preferences-inner relative z-10 flex h-full flex-col px-10 pt-8 pb-12">
+          <header className="notification-preferences-header flex items-center justify-between">
             <img src={logo} alt="Aramco Digital" className="h-14 md:h-16 w-auto" />
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-[#1F2937] shadow-sm transition hover:bg-white"
+              className="notification-preferences-back inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-[#1F2937] shadow-sm transition hover:bg-white"
             >
               <span aria-hidden="true">‹</span>
               Back
@@ -172,18 +194,22 @@ export default function NotificationPreferences() {
           <div className="flex-1 flex items-center justify-center py-10">
             <form
               onSubmit={handleSave}
-              className="w-full max-w-[580px] space-y-8 rounded-[28px] border border-white/70 bg-white/80 backdrop-blur-sm px-10 py-10 shadow-[0_20px_45px_rgba(31,41,55,0.08)]"
+              className="notification-preferences-card w-full max-w-[580px] space-y-8 rounded-[28px] border border-white/70 bg-white/80 backdrop-blur-sm px-10 py-10 shadow-[0_20px_45px_rgba(31,41,55,0.08)]"
             >
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-[#111827] tracking-tight">Notification Preferences</h1>
-                <p className="text-sm text-[#6B7280]">
+                <h1 className="notification-preferences-title text-3xl font-bold text-[#111827] tracking-tight">
+                  Notification Preferences
+                </h1>
+                <p className="notification-preferences-description text-sm text-[#6B7280]">
                   Choose how you’d like to stay informed about updates, mentions, and security events.
                 </p>
               </div>
 
               <section className="space-y-4">
                 <div>
-                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Channels</h2>
+                  <h2 className="notification-preferences-section text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                    Channels
+                  </h2>
                 </div>
                 <div className="space-y-3">
                   {channelToggles.map((toggle) => renderToggleRow(toggle, preferences[toggle.key], handleChannelToggle))}
@@ -192,7 +218,9 @@ export default function NotificationPreferences() {
 
               <section className="space-y-4">
                 <div>
-                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">Events</h2>
+                  <h2 className="notification-preferences-section text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+                    Events
+                  </h2>
                 </div>
                 <div className="space-y-3">
                   {eventToggles.map((toggle) =>
@@ -205,20 +233,20 @@ export default function NotificationPreferences() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="notification-preferences-save inline-flex h-12 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isSaving ? "Saving…" : "Save"}
                 </button>
               </div>
 
               {statusMessage && (
-                <div className="rounded-2xl bg-[#ECFDF5] px-4 py-3 text-sm font-medium text-[#047857]">
+                <div className="notification-preferences-status notification-preferences-status--success rounded-2xl bg-[#ECFDF5] px-4 py-3 text-sm font-medium text-[#047857]">
                   {statusMessage}
                 </div>
               )}
 
               {errorMessage && (
-                <div className="rounded-2xl bg-[#FEF2F2] px-4 py-3 text-sm font-medium text-[#B91C1C]">
+                <div className="notification-preferences-status notification-preferences-status--error rounded-2xl bg-[#FEF2F2] px-4 py-3 text-sm font-medium text-[#B91C1C]">
                   {errorMessage}
                 </div>
               )}
