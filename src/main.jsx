@@ -5,7 +5,6 @@ import App from "./App";
 import "./index.css";
 import { initializeTheme } from "./utils/theme";
 import { ProjectsProvider } from "./context/ProjectsContext";
-import { ThemeProvider } from "@/context/ThemeContext";
 
 initializeTheme();
 
@@ -14,11 +13,9 @@ const root = createRoot(container);
 
 root.render(
   <BrowserRouter>
-    <ThemeProvider>
-      <ProjectsProvider>
-        <App />
-      </ProjectsProvider>
-    </ThemeProvider>
+    <ProjectsProvider>
+      <App />
+    </ProjectsProvider>
   </BrowserRouter>
 );
 
