@@ -238,6 +238,72 @@ export const slideTemplates = [
         })
       ])
     ]
+  },
+  {
+    id: "template-1-presentation",
+    name: "Template 1",
+    description: "PowerPoint presentation deck aligned to the Aramco Digital palette.",
+    previewAccent: palette.deepBlue,
+    assetPath: "/templates/Template1.pptx",
+    category: "Presentations",
+    editable: false,
+    previewOnly: true,
+    slides: [
+      createSlide("Cover", [
+        defaultRect({ x: 0, y: 0, w: 960, h: 540, fill: "linear-gradient(140deg, #0A2342 0%, #3E6DCC 55%, #00A19A 100%)", opacity: 0.85 }),
+        defaultRect({ x: 90, y: 88, w: 780, h: 364, fill: "rgba(255,255,255,0.88)", radius: 36 }),
+        defaultText({
+          text: "Template 1 Presentation",
+          fontSize: 46,
+          weight: 700,
+          align: "center",
+          x: 200,
+          y: 140,
+          w: 560,
+          h: 120,
+          color: palette.midBlue
+        }),
+        defaultText({
+          text: "Download the full PowerPoint deck from the template library.",
+          fontSize: 22,
+          weight: 400,
+          align: "center",
+          x: 210,
+          y: 260,
+          w: 540,
+          h: 110,
+          color: palette.gray,
+          lineHeight: 1.45
+        })
+      ]),
+      createSlide("Highlights", [
+        defaultText({ text: "Why this deck works", fontSize: 34, weight: 600, x: 120, y: 100, w: 720, h: 80 }),
+        defaultRect({ x: 120, y: 200, w: 300, h: 200, fill: "#FFFFFF", stroke: palette.lightBlue, strokeWidth: 2, radius: 32 }),
+        defaultRect({ x: 540, y: 200, w: 300, h: 200, fill: "#FFFFFF", stroke: palette.emerald, strokeWidth: 2, radius: 32 }),
+        defaultText({
+          text: "Branded master slides\nUpdated icon set\nAccessible color contrast",
+          fontSize: 18,
+          weight: 500,
+          x: 150,
+          y: 230,
+          w: 240,
+          h: 160,
+          color: palette.gray,
+          lineHeight: 1.6
+        }),
+        defaultText({
+          text: "Executive-ready layouts\nAgenda, KPI, timeline, and summary views\nDownload via /templates/Template1.pptx",
+          fontSize: 18,
+          weight: 500,
+          x: 570,
+          y: 230,
+          w: 240,
+          h: 160,
+          color: palette.gray,
+          lineHeight: 1.6
+        })
+      ])
+    ]
   }
 ];
 

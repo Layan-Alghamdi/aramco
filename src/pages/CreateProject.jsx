@@ -6,6 +6,7 @@ import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordProjectForUser } from "@/lib/usersStore";
 import SharedHeader from "@/components/SharedHeader";
+import Template1Editor from "@/components/Template1Editor";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -39,6 +40,7 @@ export default function CreateProject() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [aiSuggestion, setAiSuggestion] = useState(`AI Suggestion • Focus on: ${slideTemplates[0].description}`);
+  const [template1EditorOpen, setTemplate1EditorOpen] = useState(false);
 
   const templateOptions = useMemo(
     () =>
@@ -64,6 +66,16 @@ export default function CreateProject() {
     if (template) {
       setAiSuggestion(`AI Suggestion • Focus on: ${template.description}`);
     }
+  };
+
+  const openTemplate1Editor = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setTemplate1EditorOpen(true);
+  };
+
+  const closeTemplate1Editor = () => {
+    setTemplate1EditorOpen(false);
   };
 
   const resetForm = () => {
@@ -218,6 +230,28 @@ export default function CreateProject() {
                             </div>
                             <p className="mt-2 text-sm text-[#6B7280] leading-relaxed">{template.description}</p>
                             <p className="mt-3 text-xs uppercase tracking-wide text-[#93A3C3]">{template.tone}</p>
+                            {template.id === "template-1-presentation" ? (
+                              <div className="mt-4">
+                                <button
+                                  type="button"
+                                  onClick={openTemplate1Editor}
+                                  className="inline-flex items-center rounded-full bg-[#3E6DCC] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
+                                >
+                                  Edit (exact template)
+                                </button>
+                              </div>
+                            ) : template.assetPath ? (
+                              <div className="mt-4">
+                                <a
+                                  href={template.assetPath}
+                                  download
+                                  onClick={(event) => event.stopPropagation()}
+                                  className="inline-flex items-center rounded-full bg-[#3E6DCC] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
+                                >
+                                  Use this template
+                                </a>
+                              </div>
+                            ) : null}
                           </div>
                         </div>
                       </label>
@@ -281,6 +315,10 @@ export default function CreateProject() {
           </div>
         </div>
       </section>
+      <Template1Editor
+        isOpen={template1EditorOpen}
+        onClose={closeTemplate1Editor}
+      />
     </div>
   );
 }
