@@ -115,8 +115,8 @@ export default function Profile() {
                       <img src={user.avatarUrl} alt={user.name || "Profile avatar"} className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#111827] via-[#1F2937] to-[#2563EB] flex items-center justify-center text-white text-4xl font-semibold">
-                      {initials || ""}
+                    <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center text-4xl font-semibold text-black shadow-lg border-4 border-white/70">
+                      {initials?.slice(0, 1) || ""}
                     </div>
                   )}
                   <div className="space-y-3 w-full max-w-[360px] text-left">
