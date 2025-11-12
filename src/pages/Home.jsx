@@ -4,7 +4,7 @@ import SharedHeader from "@/components/SharedHeader";
 import { useTheme } from "@/context/ThemeContext";
 
 const LIGHT_BACKGROUND = "radial-gradient(circle at 20% 20%, #008C7A 0%, #2B7BC6 100%)";
-const DARK_BACKGROUND = "radial-gradient(circle at 30% 30%, #0A1A2F 0%, #003B2E 100%)";
+const DARK_BACKGROUND = "linear-gradient(135deg, #021027 0%, #00291E 100%)";
 
 export default function Home() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -86,11 +86,7 @@ export default function Home() {
             </div>
 
             <div className="p-10 md:p-14">
-              <div
-                className={`w-full min-h-[360px] md:min-h-[420px] rounded-[28px] transition-all duration-500 ${
-                  isDarkMode ? "bg-[#17263C]" : "bg-white"
-                }`}
-              />
+              <div className="w-full min-h-[360px] md:min-h-[420px] rounded-[28px] transition-all duration-500 bg-white/90" />
             </div>
           </div>
         </section>
