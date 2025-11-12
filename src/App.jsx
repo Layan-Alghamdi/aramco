@@ -16,6 +16,7 @@ import TeamOverview from "./pages/TeamOverview";
 import EditTeam from "./pages/EditTeam";
 import ChangePassword from "./pages/ChangePassword";
 import NotificationPreferences from "./pages/NotificationPreferences";
+import ThemePreferences from "./pages/ThemePreferences";
 
 const ProtectedRoute = ({ children }) => {
   const isAuth = typeof window !== "undefined" && localStorage.getItem("isAuth") === "1";
@@ -54,6 +55,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <NotificationPreferences />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/theme"
+        element={
+          <ProtectedRoute>
+            <ThemePreferences />
           </ProtectedRoute>
         }
       />

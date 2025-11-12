@@ -80,7 +80,7 @@ export default function Profile() {
         navigate("/profile/notifications");
         break;
       case "Theme: Light / Dark":
-        navigate("/profile/edit", { state: { focus: "theme" } });
+        navigate("/profile/theme");
         break;
       case "Log Out":
         handleLogout();
