@@ -123,7 +123,9 @@ export default function EditProfile() {
                     {avatar ? (
                       <img src={avatar} alt="Profile avatar preview" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#111827] via-[#1F2937] to-[#2563EB]" />
+                      <div className="w-full h-full bg-white flex items-center justify-center text-4xl font-semibold text-[#1A1A1A] shadow-inner" aria-hidden="true">
+                        {form.name ? form.name.trim().charAt(0).toUpperCase() : "H"}
+                      </div>
                     )}
                     <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white text-sm opacity-0 group-hover:opacity-100 transition">
                       Change Photo
