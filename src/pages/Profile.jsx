@@ -98,7 +98,7 @@ export default function Profile() {
             <img src={logo} alt="Aramco Digital" className="h-14 md:h-16 w-auto" />
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/dashboard")}
               className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-[#1F2937] shadow-sm transition hover:bg-white"
             >
               <span aria-hidden="true">‹</span>
