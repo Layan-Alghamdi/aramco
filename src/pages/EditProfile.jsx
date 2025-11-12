@@ -89,7 +89,7 @@ export default function EditProfile() {
   };
 
   return (
-    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
+    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]" style={{ background: "#FFFFFF" }}>
       <div className="relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
         <div
           aria-hidden="true"
