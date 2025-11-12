@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
-import { useTheme } from "@/context/ThemeContext";
+import { getStoredTheme, setTheme } from "@/utils/theme";
 
 const THEMES = [
   {
@@ -28,13 +28,12 @@ const backgroundStyle = { background: "#FFFFFF" };
 
 export default function ThemePreferences() {
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
-  const [selectedTheme, setSelectedTheme] = useState(theme);
+  const [selectedTheme, setSelectedTheme] = useState("system");
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    setSelectedTheme(theme);
-  }, [theme]);
+    setSelectedTheme(getStoredTheme());
+  }, []);
 
   const handleSelect = (themeId) => {
     setSelectedTheme(themeId);
@@ -85,13 +84,13 @@ export default function ThemePreferences() {
               </div>
 
               <div className="grid gap-6 md:grid-cols-3">
-                {THEMES.map((option) => {
-                  const isActive = selectedTheme === option.id;
+                {THEMES.map((theme) => {
+                  const isActive = selectedTheme === theme.id;
                   return (
                     <button
                       type="button"
-                      key={option.id}
-                      onClick={() => handleSelect(option.id)}
+                      key={theme.id}
+                      onClick={() => handleSelect(theme.id)}
                       className={`group relative flex flex-col items-start gap-4 rounded-[24px] border px-5 py-6 text-left shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]/50 ${
                         isActive ? "border-[#2563EB] bg-[#EBF2FF]" : "border-[#E2E8F0] bg-white hover:border-[#CBD5F5]"
                       }`}
@@ -101,12 +100,12 @@ export default function ThemePreferences() {
                       </span>
                       <div
                         className="h-28 w-full rounded-2xl shadow-inner"
-                        style={{ background: option.preview }}
+                        style={{ background: theme.preview }}
                         aria-hidden="true"
                       />
                       <div className="space-y-2">
-                        <h2 className="text-lg font-semibold text-[#111827]">{option.title}</h2>
-                        <p className="text-sm text-[#6B7280] leading-relaxed">{option.description}</p>
+                        <h2 className="text-lg font-semibold text-[#111827]">{theme.title}</h2>
+                        <p className="text-sm text-[#6B7280] leading-relaxed">{theme.description}</p>
                       </div>
                     </button>
                   );
