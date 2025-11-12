@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
-
-const THEME_STORAGE_KEY = "themePreference";
+import { useTheme } from "@/context/ThemeContext";
 
 const THEMES = [
   {
@@ -27,31 +26,15 @@ const THEMES = [
 
 const backgroundStyle = { background: "#FFFFFF" };
 
-function loadThemePreference() {
-  if (typeof window === "undefined") return "system";
-  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored || "system";
-}
-
-function applyTheme(theme) {
-  if (typeof document === "undefined") return;
-  const root = document.documentElement;
-  if (theme === "system") {
-    root.removeAttribute("data-theme");
-  } else {
-    root.setAttribute("data-theme", theme);
-  }
-}
-
 export default function ThemePreferences() {
   const navigate = useNavigate();
-  const [selectedTheme, setSelectedTheme] = useState("system");
+  const { theme, setTheme } = useTheme();
+  const [selectedTheme, setSelectedTheme] = useState(theme);
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    const theme = loadThemePreference();
     setSelectedTheme(theme);
-  }, []);
+  }, [theme]);
 
   const handleSelect = (themeId) => {
     setSelectedTheme(themeId);
@@ -60,10 +43,7 @@ export default function ThemePreferences() {
 
   const handleSave = (event) => {
     event.preventDefault();
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(THEME_STORAGE_KEY, selectedTheme);
-    }
-    applyTheme(selectedTheme);
+    setTheme(selectedTheme);
     setStatus("Theme preference saved.");
   };
 
@@ -105,13 +85,13 @@ export default function ThemePreferences() {
               </div>
 
               <div className="grid gap-6 md:grid-cols-3">
-                {THEMES.map((theme) => {
-                  const isActive = selectedTheme === theme.id;
+                {THEMES.map((option) => {
+                  const isActive = selectedTheme === option.id;
                   return (
                     <button
                       type="button"
-                      key={theme.id}
-                      onClick={() => handleSelect(theme.id)}
+                      key={option.id}
+                      onClick={() => handleSelect(option.id)}
                       className={`group relative flex flex-col items-start gap-4 rounded-[24px] border px-5 py-6 text-left shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]/50 ${
                         isActive ? "border-[#2563EB] bg-[#EBF2FF]" : "border-[#E2E8F0] bg-white hover:border-[#CBD5F5]"
                       }`}
@@ -121,12 +101,12 @@ export default function ThemePreferences() {
                       </span>
                       <div
                         className="h-28 w-full rounded-2xl shadow-inner"
-                        style={{ background: theme.preview }}
+                        style={{ background: option.preview }}
                         aria-hidden="true"
                       />
                       <div className="space-y-2">
-                        <h2 className="text-lg font-semibold text-[#111827]">{theme.title}</h2>
-                        <p className="text-sm text-[#6B7280] leading-relaxed">{theme.description}</p>
+                        <h2 className="text-lg font-semibold text-[#111827]">{option.title}</h2>
+                        <p className="text-sm text-[#6B7280] leading-relaxed">{option.description}</p>
                       </div>
                     </button>
                   );
