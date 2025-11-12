@@ -71,6 +71,25 @@ export default function Profile() {
     navigate("/profile/edit");
   };
 
+  const handleSettingAction = (setting) => {
+    switch (setting) {
+      case "Change Password":
+        navigate("/profile/password");
+        break;
+      case "Notification Preferences":
+        navigate("/profile/notifications");
+        break;
+      case "Theme: Light / Dark":
+        navigate("/profile/edit", { state: { focus: "theme" } });
+        break;
+      case "Log Out":
+        handleLogout();
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]" style={{ background: "radial-gradient(circle at 20% 20%, #00A98E 0%, #2B7AC8 100%)" }}>
       <div className="w-full max-w-[1200px] rounded-[28px] bg-white shadow-[0_12px_50px_rgba(31,41,55,0.12)]">
@@ -158,7 +177,7 @@ export default function Profile() {
                         <li key={item}>
                           <button
                             type="button"
-                            onClick={isLogout ? handleLogout : undefined}
+                            onClick={() => handleSettingAction(item)}
                             className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-base font-medium transition ${
                               isLogout ? "bg-[#FEE2E2] text-[#B91C1C] hover:bg-[#FCA5A5]" : "bg-[#F9FAFB] text-[#1F2937] hover:bg-[#E5E7EB]"
                             }`}
