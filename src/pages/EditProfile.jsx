@@ -89,18 +89,12 @@ export default function EditProfile() {
   };
 
   return (
-    <section
-      className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]"
-      style={{ background: "#FFFFFF" }}
-    >
+    <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 font-[Inter,ui-sans-serif]">
       <div className="relative w-full max-w-[1200px] overflow-hidden rounded-[28px] min-h-[520px]">
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(135% 100% at 72% 45%, #FFFFFF 0%, #F4F6FF 18%, #DDE6FB 36%, #A9C1F4 56%, #6FA1E6 76%, #3C76C9 92%, #29A366 100%)"
-          }}
+          style={{ background: "#FFFFFF" }}
         />
 
         <div className="relative z-10 flex h-full flex-col px-10 pt-8 pb-12">
