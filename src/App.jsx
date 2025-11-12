@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -17,6 +17,13 @@ import EditTeam from "./pages/EditTeam";
 import ChangePassword from "./pages/ChangePassword";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import ThemePreferences from "./pages/ThemePreferences";
+import {
+  applyTheme,
+  initializeTheme,
+  loadThemePreference,
+  subscribeToSystemTheme,
+  THEME_STORAGE_KEY
+} from "./lib/theme";
 
 const ProtectedRoute = ({ children }) => {
   const isAuth = typeof window !== "undefined" && localStorage.getItem("isAuth") === "1";
@@ -27,6 +34,34 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default function App() {
+  useEffect(() => {
+    initializeTheme();
+
+    const unsubscribeSystem = subscribeToSystemTheme(() => {
+      if (loadThemePreference() === "system") {
+        applyTheme("system");
+      }
+    });
+
+    const handleStorage = (event) => {
+      if (event.key === THEME_STORAGE_KEY) {
+        const preference = loadThemePreference();
+        applyTheme(preference);
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", handleStorage);
+    }
+
+    return () => {
+      unsubscribeSystem();
+      if (typeof window !== "undefined") {
+        window.removeEventListener("storage", handleStorage);
+      }
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
