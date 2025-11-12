@@ -22,6 +22,8 @@ export default function EditProfile() {
   const [avatar, setAvatar] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  const placeholderInitial = (form.name?.trim()?.[0] ?? "A").toUpperCase();
+
   useEffect(() => {
     if (user) {
       setForm({
@@ -123,7 +125,9 @@ export default function EditProfile() {
                     {avatar ? (
                       <img src={avatar} alt="Profile avatar preview" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-white" />
+                      <div className="flex h-full w-full items-center justify-center bg-white text-3xl font-semibold text-[#1A1A1A]">
+                        {placeholderInitial}
+                      </div>
                     )}
                     <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white text-sm opacity-0 group-hover:opacity-100 transition">
                       Change Photo
