@@ -40,7 +40,7 @@ export default function AvatarUploader({ value, onChange, label = "Team avatar" 
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="glow-button inline-flex items-center rounded-full bg-[#1B1533] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
+            className="glow-btn inline-flex items-center rounded-full bg-[#1B1533] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
           >
             Upload
           </button>
@@ -48,7 +48,7 @@ export default function AvatarUploader({ value, onChange, label = "Team avatar" 
             <button
               type="button"
               onClick={() => onChange("")}
-              className="glow-button inline-flex items-center rounded-full border border-[#D1D5DB] bg-white px-4 py-2 text-sm font-semibold text-[#1B1533] hover:bg-[#F9FAFB] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
+              className="glow-btn inline-flex items-center rounded-full border border-[#D1D5DB] bg-white px-4 py-2 text-sm font-semibold text-[#1B1533] hover:bg-[#F9FAFB] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
             >
               Remove
             </button>
