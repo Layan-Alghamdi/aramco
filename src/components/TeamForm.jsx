@@ -151,7 +151,7 @@ export default function TeamForm({
         <button
           type="submit"
           disabled={isSubmitDisabled}
-          className="glow-button inline-flex items-center rounded-full bg-[#1B1533] px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition disabled:cursor-not-allowed disabled:opacity-50"
+          className="glow-button primary inline-flex items-center rounded-full bg-[#1B1533] px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitLabel}
         </button>
