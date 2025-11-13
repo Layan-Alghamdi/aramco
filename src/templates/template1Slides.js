@@ -3,16 +3,21 @@ import logoAsset from "../../pic/aramco_digital_logo_transparent-removebg-previe
 export const BASE_WIDTH = 1280;
 export const BASE_HEIGHT = 720;
 
-// Utility to convert design pixels to normalized values when needed
 export const px = (value) => value;
 
 const defaultFontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
+const GRADIENT_BG = "linear-gradient(135deg, #002B49 0%, #0095C8 60%, #00B5AD 100%)";
+const PRIMARY_BG = "#002B49";
+const SECONDARY_TEXT = "#C5D3E0";
+const ACCENT = "#00B5AD";
+const BORDER_BLUE = "#003D73";
 
 export const template1Slides = [
   {
     id: "slide-1",
     name: "Cover",
-    backgroundImage: "/templates/template1_slides/slide-001.png",
+    background: GRADIENT_BG,
+    referenceImage: "/templates/template1_slides/slide-001.png",
     layers: [
       {
         key: "title",
@@ -46,7 +51,7 @@ export const template1Slides = [
           fontSize: 30,
           fontWeight: 400,
           lineHeight: 1.4,
-          color: "#E9F2FF",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -65,7 +70,7 @@ export const template1Slides = [
           fontSize: 24,
           fontWeight: 600,
           lineHeight: 1.3,
-          color: "#FFFFFF",
+          color: ACCENT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -87,7 +92,8 @@ export const template1Slides = [
   {
     id: "slide-2",
     name: "What is SASE",
-    backgroundImage: "/templates/template1_slides/slide-002.png",
+    background: GRADIENT_BG,
+    referenceImage: "/templates/template1_slides/slide-002.png",
     layers: [
       {
         key: "title",
@@ -97,13 +103,13 @@ export const template1Slides = [
         style: {
           left: px(120),
           top: px(80),
-          width: px(800),
+          width: px(960),
           height: px(80),
-          fontSize: 52,
+          fontSize: 54,
           fontWeight: 700,
           lineHeight: 1.2,
-          color: "#1E3A8A",
-          letterSpacing: -0.5,
+          color: "#FFFFFF",
+          letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
         }
@@ -119,10 +125,10 @@ export const template1Slides = [
           top: px(190),
           width: px(1040),
           height: px(420),
-          fontSize: 28,
+          fontSize: 30,
           fontWeight: 400,
           lineHeight: 1.45,
-          color: "#111827",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -144,7 +150,8 @@ export const template1Slides = [
   {
     id: "slide-3",
     name: "Developer workflows",
-    backgroundImage: "/templates/template1_slides/slide-003.png",
+    background: GRADIENT_BG,
+    referenceImage: "/templates/template1_slides/slide-003.png",
     layers: [
       {
         key: "title",
@@ -154,13 +161,13 @@ export const template1Slides = [
         style: {
           left: px(120),
           top: px(80),
-          width: px(960),
+          width: px(1040),
           height: px(80),
           fontSize: 48,
           fontWeight: 700,
           lineHeight: 1.25,
-          color: "#1E3A8A",
-          letterSpacing: -0.4,
+          color: "#FFFFFF",
+          letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
         }
@@ -176,10 +183,10 @@ export const template1Slides = [
           top: px(210),
           width: px(1000),
           height: px(380),
-          fontSize: 28,
+          fontSize: 30,
           fontWeight: 400,
           lineHeight: 1.5,
-          color: "#111827",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -201,7 +208,8 @@ export const template1Slides = [
   {
     id: "slide-4",
     name: "Why embrace",
-    backgroundImage: "/templates/template1_slides/slide-004.png",
+    background: GRADIENT_BG,
+    referenceImage: "/templates/template1_slides/slide-004.png",
     layers: [
       {
         key: "title",
@@ -211,13 +219,13 @@ export const template1Slides = [
         style: {
           left: px(120),
           top: px(90),
-          width: px(960),
+          width: px(1040),
           height: px(80),
-          fontSize: 44,
+          fontSize: 48,
           fontWeight: 700,
           lineHeight: 1.2,
-          color: "#1E3A8A",
-          letterSpacing: -0.4,
+          color: "#FFFFFF",
+          letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
         }
@@ -232,10 +240,10 @@ export const template1Slides = [
           top: px(220),
           width: px(340),
           height: px(260),
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: 600,
           lineHeight: 1.5,
-          color: "#0F172A",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -251,10 +259,10 @@ export const template1Slides = [
           top: px(220),
           width: px(340),
           height: px(260),
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: 600,
           lineHeight: 1.5,
-          color: "#0F172A",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -270,10 +278,10 @@ export const template1Slides = [
           top: px(220),
           width: px(340),
           height: px(260),
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: 600,
           lineHeight: 1.5,
-          color: "#0F172A",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -295,7 +303,8 @@ export const template1Slides = [
   {
     id: "slide-5",
     name: "Key benefits",
-    backgroundImage: "/templates/template1_slides/slide-005.png",
+    background: GRADIENT_BG,
+    referenceImage: "/templates/template1_slides/slide-005.png",
     layers: [
       {
         key: "title",
@@ -305,13 +314,13 @@ export const template1Slides = [
         style: {
           left: px(120),
           top: px(90),
-          width: px(960),
+          width: px(1040),
           height: px(80),
-          fontSize: 44,
+          fontSize: 48,
           fontWeight: 700,
           lineHeight: 1.2,
-          color: "#1E3A8A",
-          letterSpacing: -0.4,
+          color: "#FFFFFF",
+          letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
         }
@@ -326,10 +335,10 @@ export const template1Slides = [
           top: px(230),
           width: px(300),
           height: px(260),
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: 600,
           lineHeight: 1.5,
-          color: "#0F172A",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -345,10 +354,10 @@ export const template1Slides = [
           top: px(230),
           width: px(300),
           height: px(260),
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: 600,
           lineHeight: 1.5,
-          color: "#0F172A",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -364,10 +373,10 @@ export const template1Slides = [
           top: px(230),
           width: px(320),
           height: px(260),
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: 600,
           lineHeight: 1.5,
-          color: "#0F172A",
+          color: SECONDARY_TEXT,
           letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
@@ -389,7 +398,8 @@ export const template1Slides = [
   {
     id: "slide-6",
     name: "Thank you",
-    backgroundImage: "/templates/template1_slides/slide-006.png",
+    background: GRADIENT_BG,
+    referenceImage: "/templates/template1_slides/slide-006.png",
     layers: [
       {
         key: "title",
@@ -404,8 +414,8 @@ export const template1Slides = [
           fontSize: 86,
           fontWeight: 700,
           lineHeight: 1.1,
-          color: "#1E3A8A",
-          letterSpacing: -0.6,
+          color: "#FFFFFF",
+          letterSpacing: 0,
           fontFamily: defaultFontFamily,
           align: "left"
         }

@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
@@ -7,6 +7,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordProjectForUser } from "@/lib/usersStore";
 import SharedHeader from "@/components/SharedHeader";
 import Template1Editor from "@/components/Template1Editor";
+import Template1Viewer from "@/components/Template1Viewer";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -32,6 +33,7 @@ const backgroundStyle = {
 
 export default function CreateProject() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addProject } = useProjects();
   const currentUser = useCurrentUser();
 
@@ -41,6 +43,20 @@ export default function CreateProject() {
   const [successMessage, setSuccessMessage] = useState("");
   const [aiSuggestion, setAiSuggestion] = useState(`AI Suggestion • Focus on: ${slideTemplates[0].description}`);
   const [template1EditorOpen, setTemplate1EditorOpen] = useState(false);
+  const [template1ViewerOpen, setTemplate1ViewerOpen] = useState(false);
+
+  useEffect(() => {
+    setTemplate1EditorOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.openTemplate1Editor) {
+      setTemplate1EditorOpen(true);
+      const newState = { ...location.state };
+      delete newState.openTemplate1Editor;
+      navigate(location.pathname, { replace: true, state: newState });
+    }
+  }, [location, navigate]);
 
   const templateOptions = useMemo(
     () =>
@@ -68,14 +84,24 @@ export default function CreateProject() {
     }
   };
 
-  const openTemplate1Editor = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setTemplate1EditorOpen(true);
-  };
-
   const closeTemplate1Editor = () => {
     setTemplate1EditorOpen(false);
+  };
+
+  const handleTemplate1EditNavigate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    navigate("/create", { state: { openTemplate1Editor: true } });
+  };
+
+  const openTemplate1Preview = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setTemplate1ViewerOpen(true);
+  };
+
+  const closeTemplate1Preview = () => {
+    setTemplate1ViewerOpen(false);
   };
 
   const resetForm = () => {
@@ -231,13 +257,28 @@ export default function CreateProject() {
                             <p className="mt-2 text-sm text-[#6B7280] leading-relaxed">{template.description}</p>
                             <p className="mt-3 text-xs uppercase tracking-wide text-[#93A3C3]">{template.tone}</p>
                             {template.id === "template-1-presentation" ? (
-                              <div className="mt-4">
+                              <div className="mt-4 flex flex-wrap items-center gap-2">
                                 <button
                                   type="button"
-                                  onClick={openTemplate1Editor}
+                                  onClick={openTemplate1Preview}
+                                  className="inline-flex items-center rounded-full border border-[#3E6DCC] bg-white px-4 py-2 text-xs font-semibold text-[#3E6DCC] shadow-sm transition hover:bg-[#EEF2FF]"
+                                >
+                                  Preview
+                                </button>
+                                <a
+                                  href={template.assetPath ?? "/templates/Template1.pptx"}
+                                  download
+                                  onClick={(event) => event.stopPropagation()}
                                   className="inline-flex items-center rounded-full bg-[#3E6DCC] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
                                 >
-                                  Edit (exact template)
+                                  Download
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={handleTemplate1EditNavigate}
+                                  className="inline-flex items-center rounded-full border border-[#003D73] bg-white px-4 py-2 text-xs font-semibold text-[#003D73] shadow-sm transition hover:bg-[#F0F5F9]"
+                                >
+                                  Edit in /create
                                 </button>
                               </div>
                             ) : template.assetPath ? (
@@ -318,6 +359,11 @@ export default function CreateProject() {
       <Template1Editor
         isOpen={template1EditorOpen}
         onClose={closeTemplate1Editor}
+        onBackToLibrary={() => setTemplate1EditorOpen(false)}
+      />
+      <Template1Viewer
+        isOpen={template1ViewerOpen}
+        onClose={closeTemplate1Preview}
       />
     </div>
   );

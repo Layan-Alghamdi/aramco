@@ -38,54 +38,17 @@ const mergeWithDefaults = (saved) => {
   return merged;
 };
 
-const formatTextForDisplay = (value = "") =>
-  value.replace(/\u00a0/g, " ").replace(/\n/g, "<br />");
-
 const sanitizeInput = (value = "") => value.replace(/\r/g, "");
 
 const pxToInches = (valuePx, axis = "x") => {
   if (axis === "y") {
-    return (valuePx / BASE_HEIGHT) * 5.625; // 5.625 inches tall for 16:9 layout
+    return (valuePx / BASE_HEIGHT) * 5.625;
   }
-  return (valuePx / BASE_WIDTH) * 10; // 10 inches wide
+  return (valuePx / BASE_WIDTH) * 10;
 };
 
-const useBackgrounds = () => {
-  const [backgrounds, setBackgrounds] = useState({});
-
-  useEffect(() => {
-    let isMounted = true;
-    const load = async () => {
-      const entries = await Promise.all(
-        template1Slides.map(
-          (slide) =>
-            new Promise((resolve) => {
-              if (!slide.backgroundImage) {
-                resolve([slide.id, null]);
-                return;
-              }
-              const img = new Image();
-              img.onload = () => resolve([slide.id, slide.backgroundImage]);
-              img.onerror = () => resolve([slide.id, null]);
-              img.src = slide.backgroundImage;
-            })
-        )
-      );
-      if (!isMounted) return;
-      const map = entries.reduce((acc, [id, src]) => {
-        if (src) acc[id] = src;
-        return acc;
-      }, {});
-      setBackgrounds(map);
-    };
-    load();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  return backgrounds;
-};
+const formatTextForDisplay = (value = "") =>
+  sanitizeInput(value).replace(/\u00a0/g, " ").replace(/\n/g, "<br />");
 
 async function getImageAsBase64(url) {
   if (!url) return null;
@@ -103,7 +66,7 @@ async function getImageAsBase64(url) {
   return base64;
 }
 
-export default function Template1Editor({ isOpen, onClose }) {
+export default function Template1Editor({ isOpen, onClose, onBackToLibrary }) {
   const [design, setDesign] = useState(() => createDefaultState());
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [message, setMessage] = useState("");
@@ -111,6 +74,7 @@ export default function Template1Editor({ isOpen, onClose }) {
   const [zoomLevel, setZoomLevel] = useState("fit");
   const [scale, setScale] = useState(1);
   const [autoSavedAt, setAutoSavedAt] = useState(null);
+  const [colorProof, setColorProof] = useState(false);
 
   const autoSaveTimer = useRef(null);
   const hasLoadedRef = useRef(false);
@@ -118,12 +82,9 @@ export default function Template1Editor({ isOpen, onClose }) {
   const scaledWrapperRef = useRef(null);
   const viewportRef = useRef(null);
 
-  const backgrounds = useBackgrounds();
-
   const currentSlide = template1Slides[activeSlideIndex];
   const currentState = design[currentSlide.id] ?? { layers: {}, logoUrl: null };
 
-  // Load saved design when editor first opens
   useEffect(() => {
     if (!isOpen) return;
     if (hasLoadedRef.current) return;
@@ -142,7 +103,6 @@ export default function Template1Editor({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Auto-save with debounce
   useEffect(() => {
     if (!isOpen) return;
     if (autoSaveTimer.current) {
@@ -164,7 +124,6 @@ export default function Template1Editor({ isOpen, onClose }) {
     };
   }, [design, isOpen]);
 
-  // Close on escape
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event) => {
@@ -180,7 +139,6 @@ export default function Template1Editor({ isOpen, onClose }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Zoom handling
   const recalcScale = useCallback(() => {
     if (!isOpen) return;
     if (!viewportRef.current) return;
@@ -337,21 +295,8 @@ export default function Template1Editor({ isOpen, onClose }) {
         const slideState = design[slideDef.id] ?? createDefaultState()[slideDef.id];
         const slide = pptx.addSlide();
 
-        // Background
-        if (backgrounds[slideDef.id]) {
-          try {
-            const bgData = await getImageAsBase64(backgrounds[slideDef.id]);
-            if (bgData) {
-              slide.addImage({ data: bgData, x: 0, y: 0, w: 10, h: 5.625 });
-            }
-          } catch (error) {
-            console.warn("Could not embed background for", slideDef.id, error);
-          }
-        } else {
-          slide.background = { color: "FFFFFF" };
-        }
+        slide.background = { color: "002B49" };
 
-        // Logo
         if (slideDef.logo) {
           const logoUrl = slideState.logoUrl ?? slideDef.logo.defaultValue;
           if (logoUrl) {
@@ -372,7 +317,6 @@ export default function Template1Editor({ isOpen, onClose }) {
           }
         }
 
-        // Text layers
         slideDef.layers.forEach((layer) => {
           const textValue = slideState.layers[layer.key] ?? layer.defaultValue;
           slide.addText(textValue, {
@@ -383,7 +327,7 @@ export default function Template1Editor({ isOpen, onClose }) {
             fontFace: "Arial",
             fontSize: layer.style.fontSize,
             bold: (layer.style.fontWeight ?? 400) >= 700,
-            color: (layer.style.color ?? "#111111").replace("#", ""),
+            color: (layer.style.color ?? "#FFFFFF").replace("#", ""),
             align: (layer.style.align ?? "left").toUpperCase(),
             valign: "top"
           });
@@ -400,7 +344,7 @@ export default function Template1Editor({ isOpen, onClose }) {
     }
   };
 
-  const thumbnails = useMemo(() => template1Slides.map((slide) => backgrounds[slide.id] ?? null), [backgrounds]);
+  const thumbnails = useMemo(() => template1Slides.map((slide) => slide.referenceImage ?? null), []);
 
   if (!isOpen) return null;
 
@@ -417,11 +361,22 @@ export default function Template1Editor({ isOpen, onClose }) {
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-[#E5ECFF] px-8 py-6">
-          <div>
-            <h2 className="text-2xl font-semibold text-[#1E1E1E]">Template 1 • Exact slide editor</h2>
-            <p className="mt-1 text-sm text-[#6B7280]">
-              Layout is locked to the PPTX. Click text on the canvas to edit in place. Auto-saves every few seconds.
-            </p>
+          <div className="flex items-start gap-3">
+            {onBackToLibrary ? (
+              <button
+                type="button"
+                onClick={onBackToLibrary}
+                className="inline-flex items-center gap-2 rounded-full border border-[#003D73] bg-white px-4 py-2 text-sm font-semibold text-[#003D73] shadow-sm transition hover:bg-[#F0F5F9]"
+              >
+                ← Back to Library
+              </button>
+            ) : null}
+            <div>
+              <h2 className="text-2xl font-semibold text-[#1E1E1E]">Template 1 • Exact slide editor</h2>
+              <p className="mt-1 text-sm text-[#6B7280]">
+                Layout is locked to the PPTX. Click text on the canvas to edit in place. Auto-saves every few seconds.
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-[#475569]">
@@ -435,6 +390,15 @@ export default function Template1Editor({ isOpen, onClose }) {
                 <option value="100">100%</option>
                 <option value="150">150%</option>
               </select>
+            </label>
+            <label className="flex items-center gap-2 text-sm font-medium text-[#475569]">
+              <input
+                type="checkbox"
+                checked={colorProof}
+                onChange={(event) => setColorProof(event.target.checked)}
+                className="h-4 w-4 rounded border border-[#CBD5F5] text-[#3E6DCC] focus:ring-[#3E6DCC]"
+              />
+              Color proof
             </label>
             <button
               type="button"
@@ -524,11 +488,14 @@ export default function Template1Editor({ isOpen, onClose }) {
                     className="relative overflow-hidden rounded-3xl shadow-[0_12px_24px_rgba(15,23,42,0.18)]"
                     style={{ width: BASE_WIDTH, height: BASE_HEIGHT, backgroundColor: "#FFFFFF" }}
                   >
-                    {backgrounds[currentSlide.id] ? (
-                      <img
-                        src={backgrounds[currentSlide.id]}
-                        alt="Slide background"
-                        className="absolute inset-0 h-full w-full object-cover"
+                    {currentSlide.background ? (
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: currentSlide.background,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center"
+                        }}
                       />
                     ) : null}
 
@@ -578,6 +545,14 @@ export default function Template1Editor({ isOpen, onClose }) {
                         />
                       );
                     })}
+
+                    {colorProof && currentSlide.referenceImage ? (
+                      <img
+                        src={currentSlide.referenceImage}
+                        alt="Color proof reference"
+                        className="pointer-events-none absolute inset-0 h-full w-full opacity-30"
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>
