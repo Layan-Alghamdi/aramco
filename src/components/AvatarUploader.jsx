@@ -20,7 +20,7 @@ export default function AvatarUploader({ value, onChange, label = "Team avatar" 
   return (
     <div className="flex items-center gap-4">
       <div
-        className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-[#D1D5DB] bg-white overflow-hidden"
+        className="avatar-circle flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-[#D1D5DB] bg-white overflow-hidden"
         aria-hidden="true"
         style={{
           backgroundColor: value ? "transparent" : placeholderColor
