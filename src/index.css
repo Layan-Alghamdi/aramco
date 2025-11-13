@@ -108,4 +108,33 @@ body {
   border-color: rgba(0, 255, 255, 0.2);
 }
 
+:root[data-theme='dark'] .page-container {
+  background: linear-gradient(135deg, #062b32 0%, #05203d 100%) !important;
+}
+
+:root[data-theme='dark'] .team-form-card {
+  background: #0d1321 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), inset 0 0 12px rgba(255, 255, 255, 0.03);
+  color: #e5ecf4 !important;
+}
+
+:root[data-theme='dark'] .glow-button {
+  background: #0d1321 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 255, 255, 0.35) !important;
+  box-shadow: 0 0 10px rgba(0, 255, 225, 0.35), 0 0 20px rgba(0, 140, 255, 0.45), inset 0 0 6px rgba(255, 255, 255, 0.08) !important;
+  transition: 0.3s ease;
+}
+
+:root[data-theme='dark'] .glow-button:hover {
+  box-shadow: 0 0 14px rgba(0, 255, 225, 0.55), 0 0 28px rgba(0, 140, 255, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+:root[data-theme='dark'] .glow-button:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 10px rgba(0, 255, 225, 0.35), inset 0 0 12px rgba(0, 255, 255, 0.35) !important;
+}
+
 

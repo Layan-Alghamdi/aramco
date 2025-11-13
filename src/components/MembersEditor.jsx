@@ -52,7 +52,7 @@ export default function MembersEditor({ members, onChange }) {
         <button
           type="button"
           onClick={handleAdd}
-          className="inline-flex items-center rounded-full border border-[#D1D5DB] bg-white px-4 py-2 text-xs font-semibold text-[#1B1533] hover:bg-[#F9FAFB] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
+          className="glow-button inline-flex items-center rounded-full border border-[#D1D5DB] bg-white px-4 py-2 text-xs font-semibold text-[#1B1533] hover:bg-[#F9FAFB] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
         >
           Add another
         </button>
@@ -109,7 +109,7 @@ export default function MembersEditor({ members, onChange }) {
                   <button
                     type="button"
                     onClick={() => handleRemove(member.id)}
-                    className="inline-flex items-center rounded-full border border-[#E5E7EB] px-3 py-1 text-xs font-semibold text-[#6B7280] hover:bg-[#F3F4F6] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition disabled:opacity-50"
+                    className="glow-button inline-flex items-center rounded-full border border-[#E5E7EB] px-3 py-1 text-xs font-semibold text-[#6B7280] hover:bg-[#F3F4F6] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition disabled:opacity-50"
                     disabled={members.length <= 1}
                     aria-label={members.length <= 1 ? "Cannot remove the last member row" : "Remove member row"}
                   >

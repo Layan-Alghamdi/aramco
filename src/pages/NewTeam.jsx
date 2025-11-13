@@ -6,10 +6,6 @@ import { createTeam } from "@/lib/teamsStore";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordTeamForUser } from "@/lib/usersStore";
 
-const containerStyle = {
-  background: "#FFFFFF"
-};
-
 const createId = () => {
   if (typeof window !== "undefined" && window.crypto?.randomUUID) {
     return window.crypto.randomUUID();
@@ -51,13 +47,13 @@ export default function NewTeam() {
   return (
     <>
       <SharedHeader />
-      <main className="mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20">
-        <section className="relative overflow-hidden rounded-[28px] min-h-[520px]" style={containerStyle}>
+      <main className="page-container mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20 transition-[background] duration-500 ease-out">
+        <section className="team-form-card relative overflow-hidden rounded-[28px] min-h-[520px] bg-white transition-[background,border,box-shadow,color] duration-500 ease-out">
           <div aria-hidden="true" className="absolute inset-0 pointer-events-none" />
-          <div className="relative z-10 flex justify-center px-6 py-10 md:px-14">
+          <div className="relative z-10 flex justify-center px-6 py-10 md:px-14 transition-colors duration-500 ease-out">
             <div className="w-full max-w-[640px]">
-              <h1 className="text-3xl font-extrabold text-[#0A0A0A]">Create a new team</h1>
-              <p className="mt-2 text-sm text-[#4B5563]">
+              <h1 className="text-3xl font-extrabold text-[#0A0A0A] transition-colors duration-500 ease-out dark:text-[#E5ECF4]">Create a new team</h1>
+              <p className="mt-2 text-sm text-[#4B5563] transition-colors duration-500 ease-out dark:text-[#C7D2DE]">
                 Set your team details, upload a logo, and invite teammates to get started.
               </p>
               <div className="mt-8">
