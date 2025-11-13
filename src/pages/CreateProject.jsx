@@ -46,10 +46,6 @@ export default function CreateProject() {
   const [template1ViewerOpen, setTemplate1ViewerOpen] = useState(false);
 
   useEffect(() => {
-    setTemplate1EditorOpen(true);
-  }, []);
-
-  useEffect(() => {
     if (location.state?.openTemplate1Editor) {
       setTemplate1EditorOpen(true);
       const newState = { ...location.state };

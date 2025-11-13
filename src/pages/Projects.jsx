@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { slideTemplateMap } from "../templates/brandTemplates";
 import SharedHeader from "@/components/SharedHeader";
+import Toast from "@/components/Toast";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const backgroundLayers = [
@@ -28,10 +29,12 @@ const formatDisplayDate = (isoString) => {
 export default function Projects() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { projects } = useProjects();
+  const { projects, removeProject } = useProjects();
   const currentUser = useCurrentUser();
 
   const [highlightId, setHighlightId] = useState(null);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  const [toast, setToast] = useState("");
 
   const [activeFilter, setActiveFilter] = useState(location.state?.filter === "mine" ? "mine" : "all");
 
@@ -54,6 +57,12 @@ export default function Projects() {
     const timeout = setTimeout(() => setHighlightId(null), 2000);
     return () => clearTimeout(timeout);
   }, [highlightId]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timeout = setTimeout(() => setToast(""), 2400);
+    return () => clearTimeout(timeout);
+  }, [toast]);
 
   const orderedProjects = useMemo(() => {
     return [...projects].sort((a, b) => {
@@ -163,7 +172,7 @@ export default function Projects() {
                   >
                     {project.description || "No description yet. Add context so teams know the story."}
                   </p>
-                  <footer className="mt-5 flex items-center justify-between text-xs text-[#6B7280] transition-colors duration-500 ease-out dark:text-[#A0B4C0]">
+                  <footer className="mt-5 flex flex-wrap items-center justify-between gap-3 text-xs text-[#6B7280] transition-colors duration-500 ease-out dark:text-[#A0B4C0]">
                     <span className="project-owner flex items-center gap-2 transition-colors duration-500 ease-out">
                       Owner • {project.ownerName ?? project.owner ?? "You"}
                       {isMine && (
@@ -172,16 +181,30 @@ export default function Projects() {
                         </span>
                       )}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/editor/${project.id}`)}
-                      className="projects-action inline-flex items-center gap-1 rounded-full bg-[#3E6DCC]/10 px-3 py-1 text-sm font-medium text-[#3E6DCC] transition group-hover:bg-[#3E6DCC]/15 dark:bg-[linear-gradient(90deg,#007B7F,#1A73E8)] dark:text-white dark:shadow-[0_0_15px_rgba(26,115,232,0.6)] dark:hover:shadow-[0_0_25px_rgba(26,115,232,0.8)] dark:hover:scale-105"
-                    >
-                      View
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15.75 15.75 8.25M9 8.25h6.75V15" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/editor/${project.id}`)}
+                        className="projects-action inline-flex items-center gap-1 rounded-full bg-[#3E6DCC]/10 px-3 py-1 text-sm font-medium text-[#3E6DCC] transition group-hover:bg-[#3E6DCC]/15 dark:bg-[linear-gradient(90deg,#007B7F,#1A73E8)] dark:text-white dark:shadow-[0_0_15px_rgba(26,115,232,0.6)] dark:hover:shadow-[0_0_25px_rgba(26,115,232,0.8)] dark:hover:scale-105"
+                      >
+                        View
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15.75 15.75 8.25M9 8.25h6.75V15" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setProjectToDelete(project)}
+                        className="inline-flex items-center gap-1 rounded-full border border-[#F87171]/60 px-3 py-1 text-sm font-medium text-[#DC2626] transition hover:bg-[#FEE2E2]"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
                   </footer>
                 </article>
               );
@@ -189,6 +212,38 @@ export default function Projects() {
           )}
         </div>
       </main>
+      <Toast message={toast} />
+
+      {projectToDelete && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-[24px] bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.25)]">
+            <h2 className="text-xl font-semibold text-[#1E1E1E]">Delete this project?</h2>
+            <p className="mt-2 text-sm text-[#4B5563]">
+              This action can’t be undone. Are you sure you want to delete {projectToDelete.name}?
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setProjectToDelete(null)}
+                className="rounded-full border border-[#D1D5DB] bg-white px-4 py-2 text-sm font-medium text-[#374151] shadow-sm hover:bg-[#F9FAFB]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  removeProject(projectToDelete.id);
+                  setProjectToDelete(null);
+                  setToast("✅ Project deleted successfully.");
+                }}
+                className="inline-flex items-center rounded-full bg-[#DC2626] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#B91C1C]"
+              >
+                Delete Project
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
