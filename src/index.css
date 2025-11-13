@@ -31,7 +31,7 @@ body {
   animation: fade-in-up 0.45s ease forwards;
 }
 
-@keyframes aboutGradientShift {
+@keyframes gradientShift {
   0% {
     background-position: 0% 50%;
   }
@@ -43,10 +43,69 @@ body {
   }
 }
 
-.dark .about-page {
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(0, 255, 255, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+}
+
+.dark .about-page,
+.dark .projects-page {
   background: linear-gradient(135deg, #010E24, #041B2B, #003C47, #011A2D);
   background-size: 400% 400%;
-  animation: aboutGradientShift 20s ease infinite;
+  animation: gradientShift 20s ease infinite;
+}
+
+.dark .project-card {
+  background-color: #0B1622;
+  color: #E4E8EE;
+  border: 1px solid rgba(0, 255, 255, 0.05);
+  border-radius: 18px;
+  box-shadow: 0 0 20px rgba(0, 123, 127, 0.25);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  animation: softPulse 4s ease-in-out infinite;
+}
+
+.dark .project-card:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.7), 0 0 45px rgba(26, 115, 232, 0.4);
+  border-color: rgba(0, 255, 255, 0.2);
+}
+
+.dark .projects-heading {
+  color: #ffffff;
+}
+
+.dark .projects-subtitle {
+  color: #c7d2de;
+}
+
+.dark .project-title {
+  color: #e4e8ee;
+}
+
+.dark .project-meta {
+  color: #a0b4c0;
+}
+
+.dark .project-description {
+  color: #c7d2de;
+}
+
+.dark .project-owner {
+  color: #9aa6b4;
+}
+
+.dark .no-projects {
+  background: rgba(11, 22, 34, 0.65);
+  color: #c7d2de;
+  border-color: rgba(0, 255, 255, 0.2);
 }
 
 
