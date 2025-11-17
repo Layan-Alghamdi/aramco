@@ -188,7 +188,8 @@ body.change-password-surface,
 body.notification-preferences-surface,
 body.theme-preferences-surface,
 body.home-surface,
-body.about-surface {
+body.about-surface,
+body.dashboard-surface {
   --notif-bg: linear-gradient(180deg, #0b1324 0%, #091120 55%, #070d1a 100%);
   --notif-surface: #121d31;
   --notif-surface-border: rgba(88, 120, 170, 0.22);
@@ -893,7 +894,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-wrapper,
 .dark body.dark-profile .notifications-nav-wrapper,
 .dark body.dark-home .notifications-nav-wrapper,
-.dark body.dark-about .notifications-nav-wrapper {
+.dark body.dark-about .notifications-nav-wrapper,
+.dark body.dark-dashboard .notifications-nav-wrapper {
   margin-bottom: 40px;
 }
 
@@ -901,7 +903,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav,
 .dark body.dark-profile .notifications-nav,
 .dark body.dark-home .notifications-nav,
-.dark body.dark-about .notifications-nav {
+.dark body.dark-about .notifications-nav,
+.dark body.dark-dashboard .notifications-nav {
   background: #0b1524;
   border-bottom: 1px solid var(--notif-navbar-border);
   box-shadow: var(--notif-navbar-shadow);
@@ -912,7 +915,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-inner,
 .dark body.dark-profile .notifications-nav-inner,
 .dark body.dark-home .notifications-nav-inner,
-.dark body.dark-about .notifications-nav-inner {
+.dark body.dark-about .notifications-nav-inner,
+.dark body.dark-dashboard .notifications-nav-inner {
   max-width: 1280px;
   padding-inline: 40px;
   height: 100%;
@@ -922,7 +926,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-logo,
 .dark body.dark-profile .notifications-nav-logo,
 .dark body.dark-home .notifications-nav-logo,
-.dark body.dark-about .notifications-nav-logo {
+.dark body.dark-about .notifications-nav-logo,
+.dark body.dark-dashboard .notifications-nav-logo {
   filter: brightness(1.1);
   height: 40px !important;
 }
@@ -931,7 +936,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-list,
 .dark body.dark-profile .notifications-nav-list,
 .dark body.dark-home .notifications-nav-list,
-.dark body.dark-about .notifications-nav-list {
+.dark body.dark-about .notifications-nav-list,
+.dark body.dark-dashboard .notifications-nav-list {
   color: var(--notif-navbar-text-muted);
   gap: 32px;
   font-size: 15px;
@@ -941,7 +947,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-link,
 .dark body.dark-profile .notifications-nav-link,
 .dark body.dark-home .notifications-nav-link,
-.dark body.dark-about .notifications-nav-link {
+.dark body.dark-about .notifications-nav-link,
+.dark body.dark-dashboard .notifications-nav-link {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -957,7 +964,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-link--idle,
 .dark body.dark-profile .notifications-nav-link--idle,
 .dark body.dark-home .notifications-nav-link--idle,
-.dark body.dark-about .notifications-nav-link--idle {
+.dark body.dark-about .notifications-nav-link--idle,
+.dark body.dark-dashboard .notifications-nav-link--idle {
   color: #cbd5e1;
 }
 
@@ -970,17 +978,20 @@ body.about-surface {
 .dark body.dark-home .notifications-nav-link--idle:hover,
 .dark body.dark-home .notifications-nav-link:focus-visible,
 .dark body.dark-about .notifications-nav-link--idle:hover,
-.dark body.dark-about .notifications-nav-link:focus-visible {
+.dark body.dark-about .notifications-nav-link:focus-visible,
+.dark body.dark-dashboard .notifications-nav-link--idle:hover,
+.dark body.dark-dashboard .notifications-nav-link:focus-visible {
   color: #ffffff;
   background: var(--notif-navbar-hover-bg);
-  box-shadow: 0 8px 20px rgba(42, 88, 174, 0.28);
+  box-shadow: 0 0 10px rgba(30, 144, 255, 0.3);
 }
 
 .dark body.dark-notifications .notifications-nav-link:focus-visible,
 .dark body.dark-features .notifications-nav-link:focus-visible,
 .dark body.dark-profile .notifications-nav-link:focus-visible,
 .dark body.dark-home .notifications-nav-link:focus-visible,
-.dark body.dark-about .notifications-nav-link:focus-visible {
+.dark body.dark-about .notifications-nav-link:focus-visible,
+.dark body.dark-dashboard .notifications-nav-link:focus-visible {
   outline: 1px solid var(--notif-navbar-outline);
   outline-offset: 2px;
 }
@@ -989,7 +1000,8 @@ body.about-surface {
 .dark body.dark-features .notifications-nav-link--active,
 .dark body.dark-profile .notifications-nav-link--active,
 .dark body.dark-home .notifications-nav-link--active,
-.dark body.dark-about .notifications-nav-link--active {
+.dark body.dark-about .notifications-nav-link--active,
+.dark body.dark-dashboard .notifications-nav-link--active {
   color: #ffffff;
   background: #112240;
   box-shadow: 0 0 10px rgba(30, 144, 255, 0.3);
@@ -1001,7 +1013,8 @@ body.about-surface {
 .dark body.dark-profile .notifications-profile-trigger,
 .dark body.dark-profile .profile-back-btn,
 .dark body.dark-home .notifications-profile-trigger,
-.dark body.dark-about .notifications-profile-trigger {
+.dark body.dark-about .notifications-profile-trigger,
+.dark body.dark-dashboard .notifications-profile-trigger {
   border: 1px solid var(--notif-control-border);
   background: #112240;
   color: #ffffff;
@@ -1015,7 +1028,8 @@ body.about-surface {
 .dark body.dark-profile .notifications-profile-trigger:hover,
 .dark body.dark-profile .profile-back-btn:hover,
 .dark body.dark-home .notifications-profile-trigger:hover,
-.dark body.dark-about .notifications-profile-trigger:hover {
+.dark body.dark-about .notifications-profile-trigger:hover,
+.dark body.dark-dashboard .notifications-profile-trigger:hover {
   background: var(--notif-control-hover);
 }
 
@@ -1024,7 +1038,8 @@ body.about-surface {
 .dark body.dark-profile .notifications-profile-trigger:focus-visible,
 .dark body.dark-profile .profile-back-btn:focus-visible,
 .dark body.dark-home .notifications-profile-trigger:focus-visible,
-.dark body.dark-about .notifications-profile-trigger:focus-visible {
+.dark body.dark-about .notifications-profile-trigger:focus-visible,
+.dark body.dark-dashboard .notifications-profile-trigger:focus-visible {
   outline: 1px solid var(--notif-navbar-outline);
   outline-offset: 2px;
 }
@@ -1033,7 +1048,8 @@ body.about-surface {
 .dark body.dark-features .notifications-profile-menu,
 .dark body.dark-profile .notifications-profile-menu,
 .dark body.dark-home .notifications-profile-menu,
-.dark body.dark-about .notifications-profile-menu {
+.dark body.dark-about .notifications-profile-menu,
+.dark body.dark-dashboard .notifications-profile-menu {
   background: var(--notif-menu-bg);
   border: 1px solid var(--notif-menu-border);
   color: var(--notif-navbar-text);
@@ -1045,7 +1061,8 @@ body.about-surface {
 .dark body.dark-features .notifications-profile-copy,
 .dark body.dark-profile .notifications-profile-copy,
 .dark body.dark-home .notifications-profile-copy,
-.dark body.dark-about .notifications-profile-copy {
+.dark body.dark-about .notifications-profile-copy,
+.dark body.dark-dashboard .notifications-profile-copy {
   color: var(--notif-navbar-text);
 }
 
@@ -1053,7 +1070,8 @@ body.about-surface {
 .dark body.dark-features .notifications-menu-item,
 .dark body.dark-profile .notifications-menu-item,
 .dark body.dark-home .notifications-menu-item,
-.dark body.dark-about .notifications-menu-item {
+.dark body.dark-about .notifications-menu-item,
+.dark body.dark-dashboard .notifications-menu-item {
   transition: background-color 0.2s ease, color 0.2s ease;
   border-radius: 12px;
   font-weight: 500;
@@ -1064,7 +1082,8 @@ body.about-surface {
 .dark body.dark-features .notifications-menu-item:hover,
 .dark body.dark-profile .notifications-menu-item:hover,
 .dark body.dark-home .notifications-menu-item:hover,
-.dark body.dark-about .notifications-menu-item:hover {
+.dark body.dark-about .notifications-menu-item:hover,
+.dark body.dark-dashboard .notifications-menu-item:hover {
   background: var(--notif-menu-item-hover);
 }
 
@@ -1072,7 +1091,8 @@ body.about-surface {
 .dark body.dark-features .notifications-menu-item:focus-visible,
 .dark body.dark-profile .notifications-menu-item:focus-visible,
 .dark body.dark-home .notifications-menu-item:focus-visible,
-.dark body.dark-about .notifications-menu-item:focus-visible {
+.dark body.dark-about .notifications-menu-item:focus-visible,
+.dark body.dark-dashboard .notifications-menu-item:focus-visible {
   outline: 1px solid var(--notif-navbar-outline);
   outline-offset: 1px;
 }
@@ -1081,7 +1101,8 @@ body.about-surface {
 .dark body.dark-features .notifications-signout,
 .dark body.dark-profile .notifications-signout,
 .dark body.dark-home .notifications-signout,
-.dark body.dark-about .notifications-signout {
+.dark body.dark-about .notifications-signout,
+.dark body.dark-dashboard .notifications-signout {
   background: var(--notif-signout-bg);
   border: 1px solid var(--notif-signout-border);
   color: var(--notif-signout-text);
@@ -1092,7 +1113,8 @@ body.about-surface {
 .dark body.dark-features .notifications-signout:hover,
 .dark body.dark-profile .notifications-signout:hover,
 .dark body.dark-home .notifications-signout:hover,
-.dark body.dark-about .notifications-signout:hover {
+.dark body.dark-about .notifications-signout:hover,
+.dark body.dark-dashboard .notifications-signout:hover {
   background: rgba(223, 96, 96, 0.28);
   border-color: rgba(255, 142, 142, 0.52);
 }
@@ -1101,7 +1123,8 @@ body.about-surface {
 .dark body.dark-features .notifications-signout span,
 .dark body.dark-profile .notifications-signout span,
 .dark body.dark-home .notifications-signout span,
-.dark body.dark-about .notifications-signout span {
+.dark body.dark-about .notifications-signout span,
+.dark body.dark-dashboard .notifications-signout span {
   opacity: 0.82;
 }
 

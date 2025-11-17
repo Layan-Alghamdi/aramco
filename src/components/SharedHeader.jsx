@@ -213,7 +213,8 @@ export default function SharedHeader({ variant = "default" }) {
   const isProfileRoute = location.pathname === "/profile";
   const isHomeRoute = location.pathname === "/";
   const isAboutRoute = location.pathname === "/about";
-  const isScopedDark = (isNotificationsRoute || isFeaturesRoute || isProfileRoute || isHomeRoute || isAboutRoute) && themeMode === "dark";
+  const isDashboardRoute = location.pathname === "/dashboard";
+  const isScopedDark = (isNotificationsRoute || isFeaturesRoute || isProfileRoute || isHomeRoute || isAboutRoute || isDashboardRoute) && themeMode === "dark";
   const wrapperClasses = `${isDashboard ? "mb-6" : "mb-8 md:mb-10"}`;
   const barClasses = [
     "w-full transition-all duration-200",

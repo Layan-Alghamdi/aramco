@@ -8,6 +8,7 @@ import useTeams from "@/hooks/useTeams";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useProjects } from "@/context/ProjectsContext";
 import { getTemplatesForUser } from "@/lib/usersStore";
+import useThemeMode from "@/hooks/useThemeMode";
 
 const iconColor = "#3E6DCC";
 const iconSize = 28;
@@ -32,6 +33,8 @@ export default function Dashboard() {
   const teams = useTeams();
   const user = useCurrentUser();
   const { projects } = useProjects();
+  const themeMode = useThemeMode();
+  const isDarkMode = themeMode === "dark";
 
   const myProjectsCount = useMemo(() => {
     if (!user) return 0;
@@ -64,6 +67,17 @@ export default function Dashboard() {
       navigate(location.pathname, { replace: true });
     }
   }, [location.pathname, location.state, navigate]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("dashboard-surface", "dark-dashboard");
+    } else {
+      document.body.classList.remove("dashboard-surface", "dark-dashboard");
+    }
+    return () => {
+      document.body.classList.remove("dashboard-surface", "dark-dashboard");
+    };
+  }, [isDarkMode]);
 
   const handleCardClick = (path) => {
     if (!path) return;
