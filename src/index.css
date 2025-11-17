@@ -1151,35 +1151,38 @@ body.new-team-surface {
   opacity: 0.82;
 }
 
-/* External Tools Buttons */
-.external-button {
-  padding: 10px 20px;
-  background: #ffffff;
-  border-radius: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+/* External Tools Buttons - Premium Design */
+.external-large-button {
+  padding: 14px 32px;
+  font-size: 16px;
   font-weight: 600;
+  background: #ffffff;
   color: #334155;
-  border: 1px solid #e2e8f0;
-  transition: 0.25s ease;
+  border: 2px solid #e5e7eb;
+  border-radius: 30px;
+  transition: 0.28s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   text-decoration: none;
   display: inline-block;
 }
 
-.external-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+.external-large-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-.dark .external-button,
-:root[data-theme='dark'] .external-button {
+/* Dark Mode */
+.dark .external-large-button,
+:root[data-theme='dark'] .external-large-button {
   background: #0f172a;
   color: #e2e8f0;
-  border: 1px solid #1e293b;
-  box-shadow: 0 0 12px rgba(0, 255, 200, 0.2);
+  border: 2px solid #1e293b;
+  box-shadow: 0 0 18px rgba(0, 255, 200, 0.18);
 }
 
-.dark .external-button:hover,
-:root[data-theme='dark'] .external-button:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 200, 0.35);
+.dark .external-large-button:hover,
+:root[data-theme='dark'] .external-large-button:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 26px rgba(0, 255, 200, 0.30);
 }
 

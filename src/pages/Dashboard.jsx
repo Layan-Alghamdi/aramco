@@ -254,19 +254,19 @@ export default function Dashboard() {
 
             {/* External Tools Section */}
             <div
-              className="external-tools-container"
+              className="external-tools-wrapper"
               style={{
-                marginTop: "24px",
+                marginTop: "40px",
                 display: "flex",
                 justifyContent: "center",
-                gap: "16px"
+                gap: "28px"
               }}
             >
               <a
                 href="https://outlook.office.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="external-button"
+                className="external-large-button"
               >
                 Outlook
               </a>
@@ -275,7 +275,7 @@ export default function Dashboard() {
                 href="https://teams.microsoft.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="external-button"
+                className="external-large-button"
               >
                 Microsoft Teams
               </a>
