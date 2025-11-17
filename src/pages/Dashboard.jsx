@@ -247,6 +247,24 @@ export default function Dashboard() {
                   Create team
                 </button>
               </div>
+              <div className="flex justify-center gap-4 mt-4">
+                <a
+                  href="https://outlook.office.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full bg-white dark:bg-[#0F1B2D] border border-[#E5E7EB] dark:border-[#1F2A40] text-[#1A1A1A] dark:text-white px-5 py-2.5 text-sm font-semibold shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-[0_0_15px_rgba(0,255,255,0.4),0_0_25px_rgba(0,150,255,0.2)] transition-all duration-200 hover:scale-[1.02]"
+                >
+                  Outlook
+                </a>
+                <a
+                  href="https://teams.microsoft.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full bg-white dark:bg-[#0F1B2D] border border-[#E5E7EB] dark:border-[#1F2A40] text-[#1A1A1A] dark:text-white px-5 py-2.5 text-sm font-semibold shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-[0_0_15px_rgba(0,255,255,0.4),0_0_25px_rgba(0,150,255,0.2)] transition-all duration-200 hover:scale-[1.02]"
+                >
+                  Microsoft Teams
+                </a>
+              </div>
               <div className="mt-6">
                 <TeamsGrid teams={teams} />
               </div>
