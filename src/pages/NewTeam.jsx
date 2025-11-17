@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedHeader from "@/components/SharedHeader";
 import TeamForm from "@/components/TeamForm";
 import { createTeam } from "@/lib/teamsStore";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordTeamForUser } from "@/lib/usersStore";
+import useThemeMode from "@/hooks/useThemeMode";
 
 const createId = () => {
   if (typeof window !== "undefined" && window.crypto?.randomUUID) {
@@ -17,6 +18,19 @@ export default function NewTeam() {
   const navigate = useNavigate();
   const user = useCurrentUser();
   const ownerEmail = user?.email ?? "you@aramatrix.app";
+  const themeMode = useThemeMode();
+  const isDarkMode = themeMode === "dark";
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("new-team-surface", "dark-new-team");
+    } else {
+      document.body.classList.remove("new-team-surface", "dark-new-team");
+    }
+    return () => {
+      document.body.classList.remove("new-team-surface", "dark-new-team");
+    };
+  }, [isDarkMode]);
 
   const handleSubmit = ({ name, description, avatarUrl, members }) => {
     const owner = {
@@ -46,7 +60,7 @@ export default function NewTeam() {
 
   return (
     <>
-      <SharedHeader />
+      <SharedHeader variant="dashboard" />
       <main className="page-container mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20 transition-[background] duration-500 ease-out">
         <section className="team-form-card relative overflow-hidden rounded-[28px] min-h-[520px] bg-white transition-[background,border,box-shadow,color] duration-500 ease-out">
           <div aria-hidden="true" className="absolute inset-0 pointer-events-none" />
