@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PlusCircle, Folder, UserPlus } from "lucide-react";
+import { PlusCircle, Folder, UserPlus, Mail, Users } from "lucide-react";
 import SharedHeader from "@/components/SharedHeader";
 import Toast from "@/components/Toast";
 import TeamsGrid from "@/components/TeamsGrid";
@@ -252,33 +252,52 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* External Tools Section */}
+            {/* Quick Tools Section */}
             <div
-              className="external-tools-wrapper"
+              className="quick-tools-container"
               style={{
-                marginTop: "40px",
+                marginTop: "55px",
                 display: "flex",
-                justifyContent: "center",
-                gap: "28px"
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "25px"
               }}
             >
-              <a
-                href="https://outlook.office.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="external-large-button"
-              >
-                Outlook
-              </a>
+              <h3 className="quick-tools-title">Quick Tools</h3>
 
-              <a
-                href="https://teams.microsoft.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="external-large-button"
+              <div
+                className="external-tools-wrapper glass-box"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "45px",
+                  padding: "30px 40px",
+                  borderRadius: "30px",
+                  width: "fit-content"
+                }}
               >
-                Microsoft Teams
-              </a>
+                <a
+                  href="https://outlook.office.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="super-btn outlook-btn tilt"
+                >
+                  <Mail size={26} />
+                  Outlook
+                  <span className="wave"></span>
+                </a>
+
+                <a
+                  href="https://teams.microsoft.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="super-btn teams-btn tilt"
+                >
+                  <Users size={26} />
+                  Microsoft Teams
+                  <span className="wave"></span>
+                </a>
+              </div>
             </div>
           </div>
 

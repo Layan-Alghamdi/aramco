@@ -1151,38 +1151,113 @@ body.new-team-surface {
   opacity: 0.82;
 }
 
-/* External Tools Buttons - Premium Design */
-.external-large-button {
-  padding: 14px 32px;
-  font-size: 16px;
-  font-weight: 600;
-  background: #ffffff;
-  color: #334155;
-  border: 2px solid #e5e7eb;
-  border-radius: 30px;
-  transition: 0.28s ease;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  text-decoration: none;
-  display: inline-block;
+/* QUICK TOOLS TITLE */
+.quick-tools-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: -5px;
+  color: var(--text-primary, #1a1a1a);
+  text-align: center;
 }
 
-.external-large-button:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-}
-
-/* Dark Mode */
-.dark .external-large-button,
-:root[data-theme='dark'] .external-large-button {
-  background: #0f172a;
+.dark .quick-tools-title,
+:root[data-theme='dark'] .quick-tools-title {
   color: #e2e8f0;
-  border: 2px solid #1e293b;
-  box-shadow: 0 0 18px rgba(0, 255, 200, 0.18);
 }
 
-.dark .external-large-button:hover,
-:root[data-theme='dark'] .external-large-button:hover {
-  transform: scale(1.04);
-  box-shadow: 0 0 26px rgba(0, 255, 200, 0.30);
+/* LIGHT MODE GLASS */
+.glass-box {
+  backdrop-filter: blur(18px) saturate(180%);
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+/* DARK MODE GLASS */
+.dark .glass-box,
+:root[data-theme='dark'] .glass-box {
+  background: rgba(18, 22, 30, 0.35);
+  box-shadow: 0 0 32px rgba(0, 255, 220, 0.07);
+}
+
+/* SUPER BUTTON BASE */
+.super-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 46px;
+  border-radius: 50px;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  overflow: hidden;
+  transition: 0.4s ease;
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  text-decoration: none;
+  border: none;
+}
+
+/* ICON SIZE */
+.super-btn svg {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+/* OUTLOOK STYLE */
+.outlook-btn {
+  background: linear-gradient(135deg, #1e90ff, #0066cc);
+  box-shadow: 0 0 22px rgba(30, 144, 255, 0.55);
+}
+
+/* TEAMS STYLE */
+.teams-btn {
+  background: linear-gradient(135deg, #726bff, #4338ca);
+  box-shadow: 0 0 22px rgba(99, 91, 255, 0.55);
+}
+
+/* HOVER 3D POP */
+.super-btn:hover {
+  transform: scale(1.07) rotateX(6deg) rotateY(-6deg);
+}
+
+/* WAVE SHIMMER */
+.super-btn .wave {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.20);
+  transform: skewX(-25deg);
+  transition: 0.6s ease;
+  pointer-events: none;
+}
+
+.super-btn:hover .wave {
+  left: 100%;
+}
+
+/* DARK MODE NEON BOOST */
+.dark .super-btn,
+:root[data-theme='dark'] .super-btn {
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
+}
+
+.dark .outlook-btn,
+:root[data-theme='dark'] .outlook-btn {
+  box-shadow: 0 0 30px rgba(30, 144, 255, 0.75);
+}
+
+.dark .teams-btn,
+:root[data-theme='dark'] .teams-btn {
+  box-shadow: 0 0 30px rgba(99, 91, 255, 0.75);
+}
+
+/* 3D TILT BASE */
+.tilt {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
