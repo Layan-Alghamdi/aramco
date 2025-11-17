@@ -1151,3 +1151,35 @@ body.new-team-surface {
   opacity: 0.82;
 }
 
+/* External Tools Buttons */
+.external-button {
+  padding: 10px 20px;
+  background: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  transition: 0.25s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.external-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.dark .external-button,
+:root[data-theme='dark'] .external-button {
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  box-shadow: 0 0 12px rgba(0, 255, 200, 0.2);
+}
+
+.dark .external-button:hover,
+:root[data-theme='dark'] .external-button:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.35);
+}
+
