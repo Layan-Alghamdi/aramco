@@ -79,6 +79,32 @@ export default function Dashboard() {
     };
   }, [isDarkMode]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const cmdOrCtrl = isMac ? event.metaKey : event.ctrlKey;
+
+      if (!cmdOrCtrl) return;
+
+      const target = event.target;
+      const isInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+      if (isInput) return;
+
+      const key = event.key.toLowerCase();
+
+      if (key === "c") {
+        event.preventDefault();
+        event.stopPropagation();
+        navigate("/create");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navigate]);
+
   const handleCardClick = (path) => {
     if (!path) return;
     if (path === "/projects") {

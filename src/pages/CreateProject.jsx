@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
 import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
@@ -44,6 +44,7 @@ export default function CreateProject() {
   const [aiSuggestion, setAiSuggestion] = useState(`AI Suggestion • Focus on: ${slideTemplates[0].description}`);
   const [template1EditorOpen, setTemplate1EditorOpen] = useState(false);
   const [template1ViewerOpen, setTemplate1ViewerOpen] = useState(false);
+  const handlersRef = useRef({ handleSaveProject: null, handleNewProject: null, handleCreate: null });
 
   useEffect(() => {
     if (location.state?.openTemplate1Editor) {
@@ -100,14 +101,16 @@ export default function CreateProject() {
     setTemplate1ViewerOpen(false);
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setForm({ ...initialFormState });
     setError("");
     setAiSuggestion(`AI Suggestion • Focus on: ${slideTemplates[0].description}`);
-  };
+  }, []);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSaveProject = useCallback(async (event) => {
+    if (event) {
+      event.preventDefault();
+    }
     if (!form.name.trim()) {
       setError("Please provide a project name before saving.");
       return;
@@ -150,7 +153,79 @@ export default function CreateProject() {
     } finally {
       setSaving(false);
     }
+  }, [form, addProject, currentUser, navigate, resetForm]);
+
+  const handleNewProject = useCallback(() => {
+    resetForm();
+    setSuccessMessage("New project started.");
+    setTimeout(() => setSuccessMessage(""), 2000);
+  }, [resetForm]);
+
+  useEffect(() => {
+    handlersRef.current = { handleSaveProject, handleNewProject };
+  }, [handleSaveProject, handleNewProject]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await handleSaveProject(event);
   };
+
+  useEffect(() => {
+    if (template1EditorOpen || template1ViewerOpen) {
+      console.log("Keyboard shortcuts disabled - modal is open");
+      return;
+    }
+
+    const handleKeyDown = (event) => {
+      const isMac = navigator.platform.toUpperCase().includes("MAC");
+      const cmdOrCtrl = isMac ? event.metaKey : event.ctrlKey;
+
+      // Debug: log all Cmd/Ctrl key presses
+      if (cmdOrCtrl) {
+        console.log("Cmd/Ctrl pressed with key:", event.key, "target:", event.target.tagName);
+      }
+
+      if (!cmdOrCtrl) return;
+
+      const target = event.target;
+      const isInput = target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
+      if (isInput) {
+        console.log("Ignoring shortcut - user is typing in input");
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+      console.log("Processing shortcut key:", key, "handlers available:", !!handlersRef.current.handleSaveProject);
+
+      if (key === "s") {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log("Keyboard shortcut: Cmd/Ctrl+S triggered");
+        if (handlersRef.current.handleSaveProject) {
+          handlersRef.current.handleSaveProject(event);
+        } else {
+          console.error("handleSaveProject not available in ref");
+        }
+      } else if (key === "n") {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log("Keyboard shortcut: Cmd/Ctrl+N triggered");
+        if (handlersRef.current.handleNewProject) {
+          handlersRef.current.handleNewProject();
+        } else {
+          console.error("handleNewProject not available in ref");
+        }
+      }
+    };
+
+    console.log("Keyboard shortcuts listener attached to window");
+    console.log("Handlers ref:", handlersRef.current);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => {
+      console.log("Keyboard shortcuts listener removed");
+      window.removeEventListener("keydown", handleKeyDown, true);
+    };
+  }, [template1EditorOpen, template1ViewerOpen]);
 
   return (
     <div className="min-h-screen" style={backgroundStyle}>
