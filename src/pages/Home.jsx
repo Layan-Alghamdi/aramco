@@ -1,10 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import SharedHeader from "@/components/SharedHeader";
+import useThemeMode from "@/hooks/useThemeMode";
 
 export default function Home() {
+  const themeMode = useThemeMode();
+  const isDarkMode = themeMode === "dark";
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("home-surface", "dark-home");
+    } else {
+      document.body.classList.remove("home-surface", "dark-home");
+    }
+    return () => {
+      document.body.classList.remove("home-surface", "dark-home");
+    };
+  }, [isDarkMode]);
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_20%_20%,#00A98E_0%,#2B7AC8_100%)] dark:bg-[linear-gradient(135deg,#010E24,#041B2B)] transition-[background-color,background-image] duration-400 ease-out">
+    <div className="home-shell min-h-screen bg-[radial-gradient(circle_at_20%_20%,#00A98E_0%,#2B7AC8_100%)] transition-[background-color,background-image] duration-400 ease-out">
       <SharedHeader variant="dashboard" />
       <main className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10 transition-[background-color] duration-400 ease-out">
         <section className="relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08),0_0_30px_rgba(0,150,255,0.2)] overflow-hidden dark:bg-transparent dark:shadow-none">

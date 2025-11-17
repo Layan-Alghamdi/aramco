@@ -47,7 +47,7 @@ export default function NewTeam() {
   return (
     <>
       <SharedHeader />
-      <main className="new-team-page page-container mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20 transition-[background] duration-500 ease-out">
+      <main className="page-container mx-auto max-w-[1200px] px-6 md:px-10 pt-12 md:pt-14 pb-20 transition-[background] duration-500 ease-out">
         <section className="team-form-card relative overflow-hidden rounded-[28px] min-h-[520px] bg-white transition-[background,border,box-shadow,color] duration-500 ease-out">
           <div aria-hidden="true" className="absolute inset-0 pointer-events-none" />
           <div className="relative z-10 flex justify-center px-6 py-10 md:px-14 transition-colors duration-500 ease-out">
