@@ -1,13 +1,12 @@
 import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
-import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
+import { cloneTemplateSlides, slideTemplates } from "../data/templates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { recordProjectForUser } from "@/lib/usersStore";
 import SharedHeader from "@/components/SharedHeader";
 import Template1Editor from "@/components/Template1Editor";
-import Template1Viewer from "@/components/Template1Viewer";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -43,7 +42,6 @@ export default function CreateProject() {
   const [successMessage, setSuccessMessage] = useState("");
   const [aiSuggestion, setAiSuggestion] = useState(`AI Suggestion • Focus on: ${slideTemplates[0].description}`);
   const [template1EditorOpen, setTemplate1EditorOpen] = useState(false);
-  const [template1ViewerOpen, setTemplate1ViewerOpen] = useState(false);
   const handlersRef = useRef({ handleSaveProject: null, handleNewProject: null, handleCreate: null });
 
   useEffect(() => {
@@ -53,16 +51,18 @@ export default function CreateProject() {
       delete newState.openTemplate1Editor;
       navigate(location.pathname, { replace: true, state: newState });
     }
+    if (location.state?.selectedTemplateId) {
+      setForm((prev) => ({ ...prev, templateId: location.state.selectedTemplateId }));
+      const template = slideTemplates.find((t) => t.id === location.state.selectedTemplateId);
+      if (template) {
+        setAiSuggestion(`AI Suggestion • Focus on: ${template.description}`);
+      }
+      const newState = { ...location.state };
+      delete newState.selectedTemplateId;
+      navigate(location.pathname, { replace: true, state: newState });
+    }
   }, [location, navigate]);
 
-  const templateOptions = useMemo(
-    () =>
-      slideTemplates.map((template) => ({
-        ...template,
-        tone: template.name.includes("Title") ? "Launch with impact" : "Shape the narrative"
-      })),
-    []
-  );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -83,22 +83,6 @@ export default function CreateProject() {
 
   const closeTemplate1Editor = () => {
     setTemplate1EditorOpen(false);
-  };
-
-  const handleTemplate1EditNavigate = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    navigate("/create", { state: { openTemplate1Editor: true } });
-  };
-
-  const openTemplate1Preview = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setTemplate1ViewerOpen(true);
-  };
-
-  const closeTemplate1Preview = () => {
-    setTemplate1ViewerOpen(false);
   };
 
   const resetForm = useCallback(() => {
@@ -171,7 +155,7 @@ export default function CreateProject() {
   };
 
   useEffect(() => {
-    if (template1EditorOpen || template1ViewerOpen) {
+    if (template1EditorOpen) {
       console.log("Keyboard shortcuts disabled - modal is open");
       return;
     }
@@ -225,7 +209,7 @@ export default function CreateProject() {
       console.log("Keyboard shortcuts listener removed");
       window.removeEventListener("keydown", handleKeyDown, true);
     };
-  }, [template1EditorOpen, template1ViewerOpen]);
+  }, [template1EditorOpen]);
 
   return (
     <div className="min-h-screen" style={backgroundStyle}>
@@ -283,94 +267,25 @@ export default function CreateProject() {
                 />
               </div>
 
-              <section>
-                <InputLabel htmlFor="template">Template library</InputLabel>
+              <div>
+                <InputLabel htmlFor="templateId">Template</InputLabel>
                 <p className="text-sm text-[#6B7280] mb-4">
-                  Choose a branded template to jump-start design. Slides are fully editable once you launch the studio.
+                  Select a template from the library on the Dashboard to use for this project.
                 </p>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {templateOptions.map((template) => {
-                    const isActive = form.templateId === template.id;
-                    return (
-                      <label
-                        key={template.id}
-                        className={`relative cursor-pointer rounded-3xl border bg-white/85 px-5 py-4 shadow-[0_10px_28px_rgba(62,109,204,0.12)] transition hover:shadow-[0_14px_32px_rgba(62,109,204,0.18)] ${
-                          isActive ? "border-[#3E6DCC] ring-2 ring-[#3E6DCC]/30" : "border-[#D8DEEA]"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="templateId"
-                          value={template.id}
-                          checked={isActive}
-                          onChange={handleTemplateChange}
-                          className="sr-only"
-                        />
-                        <div className="flex items-start gap-3">
-                          <div
-                            className="h-20 w-32 rounded-2xl border border-[#E5ECFF] bg-white shadow-inner flex items-center justify-center"
-                            style={{
-                              background:
-                                template.previewAccent === "#FFFFFF"
-                                  ? "linear-gradient(135deg, #E6EEFF 0%, #FFFFFF 100%)"
-                                  : `linear-gradient(135deg, ${template.previewAccent} 0%, rgba(230,238,255,0.65) 100%)`
-                            }}
-                          >
-                            <div className="h-[52px] w-[78px] rounded-xl bg-white/85 shadow-[0_6px_18px_rgba(0,0,0,0.12)] relative overflow-hidden">
-                              <span className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent" />
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h3 className="text-base font-semibold text-[#1E1E1E]">{template.name}</h3>
-                              {isActive && <span className="text-xs font-semibold text-[#3E6DCC]">Selected</span>}
-                            </div>
-                            <p className="mt-2 text-sm text-[#6B7280] leading-relaxed">{template.description}</p>
-                            <p className="mt-3 text-xs uppercase tracking-wide text-[#93A3C3]">{template.tone}</p>
-                            {template.id === "template-1-presentation" ? (
-                              <div className="mt-4 flex flex-wrap items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={openTemplate1Preview}
-                                  className="inline-flex items-center rounded-full border border-[#3E6DCC] bg-white px-4 py-2 text-xs font-semibold text-[#3E6DCC] shadow-sm transition hover:bg-[#EEF2FF]"
-                                >
-                                  Preview
-                                </button>
-                                <a
-                                  href={template.assetPath ?? "/templates/Template1.pptx"}
-                                  download
-                                  onClick={(event) => event.stopPropagation()}
-                                  className="inline-flex items-center rounded-full bg-[#3E6DCC] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
-                                >
-                                  Download
-                                </a>
-                                <button
-                                  type="button"
-                                  onClick={handleTemplate1EditNavigate}
-                                  className="inline-flex items-center rounded-full border border-[#003D73] bg-white px-4 py-2 text-xs font-semibold text-[#003D73] shadow-sm transition hover:bg-[#F0F5F9]"
-                                >
-                                  Edit in /create
-                                </button>
-                              </div>
-                            ) : template.assetPath ? (
-                              <div className="mt-4">
-                                <a
-                                  href={template.assetPath}
-                                  download
-                                  onClick={(event) => event.stopPropagation()}
-                                  className="inline-flex items-center rounded-full bg-[#3E6DCC] px-4 py-2 text-xs font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
-                                >
-                                  Use this template
-                                </a>
-                              </div>
-                            ) : null}
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              </section>
+                <select
+                  id="templateId"
+                  name="templateId"
+                  value={form.templateId}
+                  onChange={handleTemplateChange}
+                  className="w-full rounded-2xl border border-[#D8DEEA] bg-white px-4 py-3 text-base shadow-sm focus:border-[#3E6DCC] focus:ring-2 focus:ring-[#3E6DCC]/20 outline-none transition"
+                >
+                  {slideTemplates.map((template) => (
+                    <option key={template.id} value={template.id}>
+                      {template.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <section className="rounded-2xl border border-dashed border-[#C5D4F7] bg-white/70 px-5 py-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -431,10 +346,6 @@ export default function CreateProject() {
         isOpen={template1EditorOpen}
         onClose={closeTemplate1Editor}
         onBackToLibrary={() => setTemplate1EditorOpen(false)}
-      />
-      <Template1Viewer
-        isOpen={template1ViewerOpen}
-        onClose={closeTemplate1Preview}
       />
     </div>
   );

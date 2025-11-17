@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
-import { slideTemplateMap } from "../templates/brandTemplates";
+import { slideTemplateMap } from "../data/templates";
 import SharedHeader from "@/components/SharedHeader";
 import Toast from "@/components/Toast";
 import useCurrentUser from "@/hooks/useCurrentUser";

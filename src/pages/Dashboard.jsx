@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PlusCircle, Folder, UserPlus } from "lucide-react";
 import SharedHeader from "@/components/SharedHeader";
 import Toast from "@/components/Toast";
 import TeamsGrid from "@/components/TeamsGrid";
+import TemplateLibraryModal from "@/components/TemplateLibraryModal";
 import useTeams from "@/hooks/useTeams";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useProjects } from "@/context/ProjectsContext";
-import { getTemplatesForUser } from "@/lib/usersStore";
+import { getTemplatesForUser, recordProjectForUser } from "@/lib/usersStore";
+import { cloneTemplateSlides, slideTemplates } from "@/data/templates";
 import useThemeMode from "@/hooks/useThemeMode";
 
 const iconColor = "#3E6DCC";
@@ -30,9 +32,10 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [toast, setToast] = useState("");
+  const [templateLibraryModalOpen, setTemplateLibraryModalOpen] = useState(false);
   const teams = useTeams();
   const user = useCurrentUser();
-  const { projects } = useProjects();
+  const { projects, addProject } = useProjects();
   const themeMode = useThemeMode();
   const isDarkMode = themeMode === "dark";
 
@@ -68,6 +71,34 @@ export default function Dashboard() {
     }
   }, [location.pathname, location.state, navigate]);
 
+  const handleCreateProject = useCallback(async () => {
+    try {
+      const defaultTemplate = slideTemplates[0];
+      const slides = cloneTemplateSlides(defaultTemplate.id);
+      const project = addProject({
+        name: "Untitled project",
+        description: "",
+        templateId: defaultTemplate.id,
+        slides,
+        status: "Draft",
+        ownerId: user?.id ?? null,
+        ownerName: user?.name ?? "You",
+        ownerEmail: user?.email ?? "",
+        ownerRole: user?.role ?? ""
+      });
+
+      if (user?.id) {
+        recordProjectForUser(user.id, project.id);
+      }
+
+      navigate(`/editor/${project.id}`, { state: { from: "create", highlightProjectId: project.id } });
+    } catch (error) {
+      console.error("Failed to create project", error);
+      setToast("Failed to create project. Please try again.");
+      setTimeout(() => setToast(""), 3000);
+    }
+  }, [addProject, user, navigate]);
+
   useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add("dashboard-surface", "dark-dashboard");
@@ -95,7 +126,7 @@ export default function Dashboard() {
       if (key === "c") {
         event.preventDefault();
         event.stopPropagation();
-        navigate("/create");
+        handleCreateProject();
       }
     };
 
@@ -103,10 +134,14 @@ export default function Dashboard() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [navigate]);
+  }, [handleCreateProject]);
 
   const handleCardClick = (path) => {
     if (!path) return;
+    if (path === "/create") {
+      handleCreateProject();
+      return;
+    }
     if (path === "/projects") {
       navigate("/projects");
       return;
@@ -177,6 +212,24 @@ export default function Dashboard() {
 
             <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
               <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-[#1B1533] mb-2">Template library</h2>
+                  <p className="text-sm text-[#6B7280]">
+                    Choose a branded template to jump-start your design. Slides are fully editable once you launch the studio.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTemplateLibraryModalOpen(true)}
+                  className="inline-flex items-center rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
+                >
+                  Start from template
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F3F4F6] border border-[#E5E7EB]">
                     <span className="text-sm font-semibold text-[#4B5563]">👥</span>
@@ -203,6 +256,36 @@ export default function Dashboard() {
           <Toast message={toast} />
         </div>
       </section>
+      <TemplateLibraryModal
+        isOpen={templateLibraryModalOpen}
+        onClose={() => setTemplateLibraryModalOpen(false)}
+        onUseTemplate={async (template) => {
+          try {
+            const slides = cloneTemplateSlides(template.id);
+            const project = addProject({
+              name: "Untitled project",
+              description: "",
+              templateId: template.id,
+              slides,
+              status: "Draft",
+              ownerId: user?.id ?? null,
+              ownerName: user?.name ?? "You",
+              ownerEmail: user?.email ?? "",
+              ownerRole: user?.role ?? ""
+            });
+
+            if (user?.id) {
+              recordProjectForUser(user.id, project.id);
+            }
+
+            navigate(`/editor/${project.id}`, { state: { from: "create", highlightProjectId: project.id } });
+          } catch (error) {
+            console.error("Failed to create project", error);
+            setToast("Failed to create project. Please try again.");
+            setTimeout(() => setToast(""), 3000);
+          }
+        }}
+      />
     </>
   );
 }

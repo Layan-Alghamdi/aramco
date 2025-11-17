@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useProjects } from "../context/ProjectsContext";
-import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
+import { cloneTemplateSlides, slideTemplates } from "../data/templates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 import VideoPlayer from "../components/VideoPlayer";
 
@@ -78,7 +78,27 @@ export default function Editor() {
   const { projectId } = useParams();
   const { projects, updateProject } = useProjects();
 
-  const project = useMemo(() => projects.find((item) => item.id === projectId), [projects, projectId]);
+  const initialProject = useMemo(() => projects.find((item) => item.id === projectId), [projects, projectId]);
+
+  // Project state with editable title
+  const [project, setProject] = useState({
+    id: initialProject?.id || "",
+    title: initialProject?.name || "Untitled project",
+    description: initialProject?.description || "",
+    slides: initialProject?.slides || []
+  });
+
+  // Update project state when initialProject changes
+  useEffect(() => {
+    if (initialProject) {
+      setProject({
+        id: initialProject.id,
+        title: initialProject.name || "Untitled project",
+        description: initialProject.description || "",
+        slides: initialProject.slides || []
+      });
+    }
+  }, [initialProject]);
 
   const [slides, setSlides] = useState(() => project?.slides ?? [defaultSlide()]);
   const [activeSlideId, setActiveSlideId] = useState(() => slides[0]?.id);
@@ -90,9 +110,11 @@ export default function Editor() {
   });
   const [recentColors, setRecentColors] = useState([]);
   const [isOffline, setIsOffline] = useState(typeof window !== "undefined" ? !navigator.onLine : false);
+  const [saving, setSaving] = useState(false);
   const [saveState, setSaveState] = useState("saved");
   const [lastSavedAt, setLastSavedAt] = useState(() => Date.now());
   const [pendingChanges, setPendingChanges] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [aiInsights, setAiInsights] = useState({});
   const [highlightedIssueId, setHighlightedIssueId] = useState(null);
   const [aiSuggestions, setAiSuggestions] = useState([]);
@@ -124,11 +146,11 @@ export default function Editor() {
   }, [interaction]);
 
   useEffect(() => {
-    if (!project) return;
-    const nextSlides = project.slides && project.slides.length > 0 ? project.slides : [defaultSlide()];
+    if (!initialProject) return;
+    const nextSlides = initialProject.slides && initialProject.slides.length > 0 ? initialProject.slides : [defaultSlide()];
     setSlides(nextSlides);
     setActiveSlideId(nextSlides[0]?.id);
-  }, [project]);
+  }, [initialProject]);
 
   const activeSlide = useMemo(
     () => slides.find((slide) => slide.id === activeSlideId) ?? slides[0],
@@ -149,7 +171,7 @@ export default function Editor() {
 
   const hasSelection = selectedObjects.length > 0;
   const selectedObject = selectedObjects[0] ?? null;
-  const pendingStorageKey = useMemo(() => (project ? `pendingSlides_${project.id}` : null), [project]);
+  const pendingStorageKey = useMemo(() => (project.id ? `pendingSlides_${project.id}` : null), [project.id]);
 
   useEffect(() => {
     slidesRef.current = slides;
@@ -404,18 +426,28 @@ export default function Editor() {
     }
   }, [pendingStorageKey]);
 
-  const performSave = useCallback(() => {
-    if (!project || isOffline) return;
+  const performSave = useCallback(async () => {
+    if (!project.id || isOffline) return;
+    setSaving(true);
     setSaveState("saving");
-    updateProject(project.id, {
-      slides: slidesRef.current,
-      updatedAt: new Date().toISOString()
-    });
-    setLastSavedAt(Date.now());
-    setPendingChanges(false);
-    setSaveState("saved");
-    clearPendingSlides();
-    saveTimeoutRef.current = null;
+    try {
+      await updateProject(project.id, {
+        name: project.title,
+        description: project.description,
+        slides: slidesRef.current,
+        updatedAt: new Date().toISOString()
+      });
+      setLastSavedAt(Date.now());
+      setPendingChanges(false);
+      setSaveState("saved");
+      clearPendingSlides();
+    } catch (error) {
+      console.error("Failed to save project", error);
+      setSaveState("error");
+    } finally {
+      setSaving(false);
+      saveTimeoutRef.current = null;
+    }
   }, [project, isOffline, updateProject, clearPendingSlides]);
 
   const scheduleSave = useCallback(
@@ -952,7 +984,7 @@ export default function Editor() {
   }, []);
 
   useEffect(() => {
-    if (!project) return;
+    if (!initialProject) return;
     setPendingChanges(true);
     if (isOffline) {
       cachePendingSlides();
@@ -960,7 +992,7 @@ export default function Editor() {
       setSaveState("saving");
       scheduleSave();
     }
-  }, [slides, project, isOffline, cachePendingSlides, scheduleSave]);
+  }, [slides, initialProject, isOffline, cachePendingSlides, scheduleSave]);
 
   useEffect(() => {
     if (isOffline) return;
@@ -1094,7 +1126,7 @@ export default function Editor() {
     });
   };
 
-  if (!project) {
+  if (!initialProject) {
     return (
       <section className="min-h-screen flex items-center justify-center bg-[#0F172A] text-white font-['Poppins',ui-sans-serif]">
         <div className="text-center space-y-6">
@@ -1143,9 +1175,38 @@ export default function Editor() {
               </svg>
               Projects
             </button>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-[#6B7280]">Project</p>
-              <h1 className="text-lg font-semibold text-[#1E1E1E]">{project.name}</h1>
+            <div className="flex-1">
+              <p className="text-xs uppercase tracking-wide text-[#6B7280] mb-1">Project</p>
+              {isEditingTitle ? (
+                <input
+                  type="text"
+                  value={project.title}
+                  onChange={(e) => setProject((prev) => ({ ...prev, title: e.target.value }))}
+                  onBlur={() => {
+                    setIsEditingTitle(false);
+                    setPendingChanges(true);
+                    scheduleSave();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.target.blur();
+                    } else if (e.key === "Escape") {
+                      setProject((prev) => ({ ...prev, title: initialProject?.name || "Untitled project" }));
+                      setIsEditingTitle(false);
+                    }
+                  }}
+                  className="text-lg font-semibold text-[#1E1E1E] bg-transparent border-b-2 border-[#3E6DCC] focus:outline-none focus:border-[#2853b2] min-w-[200px]"
+                  autoFocus
+                />
+              ) : (
+                <h1
+                  className="text-lg font-semibold text-[#1E1E1E] cursor-pointer hover:text-[#3E6DCC] transition-colors"
+                  onClick={() => setIsEditingTitle(true)}
+                  title="Click to edit project name"
+                >
+                  {project.title}
+                </h1>
+              )}
             </div>
           </div>
           <img src={logo} alt="Aramco Digital" className="h-12 md:h-14 w-auto" />
@@ -1157,6 +1218,36 @@ export default function Editor() {
               <span>{statusMeta.icon}</span>
               <span>{statusMeta.label}</span>
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setPendingChanges(true);
+                scheduleSave(true);
+              }}
+              disabled={saving || isOffline}
+              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow transition ${
+                saving || isOffline
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#3E6DCC] text-white hover:bg-[#2853b2]"
+              }`}
+            >
+              {saving ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Save
+                </>
+              )}
+            </button>
             <button
               ref={colorButtonRef}
               type="button"

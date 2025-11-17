@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { cloneTemplateSlides, slideTemplates } from "../templates/brandTemplates";
+import { cloneTemplateSlides, templateMap } from "../data/templates";
 
 const STORAGE_KEY = "savedProjects";
 
-const [titleTemplate, textImageTemplate, twoColumnTemplate] = slideTemplates;
+const titleTemplate = templateMap["title-hero"];
+const textImageTemplate = templateMap["text-image"];
+const twoColumnTemplate = templateMap["two-column"];
 
 const normalizeObject = (object) => {
   if (!object) return object;
