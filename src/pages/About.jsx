@@ -1,7 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SharedHeader from "@/components/SharedHeader";
+import useThemeMode from "@/hooks/useThemeMode";
 
 export default function About() {
+  const themeMode = useThemeMode();
+  const isDarkMode = themeMode === "dark";
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("about-surface", "dark-about");
+    } else {
+      document.body.classList.remove("about-surface", "dark-about");
+    }
+    return () => {
+      document.body.classList.remove("about-surface", "dark-about");
+    };
+  }, [isDarkMode]);
+
   return (
     <div className="about-page min-h-screen bg-[radial-gradient(circle_at_20%_20%,#00A98E_0%,#2B7AC8_100%)] transition-[background,background-color] duration-500 ease-out">
       <SharedHeader variant="dashboard" />
