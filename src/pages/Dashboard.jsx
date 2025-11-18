@@ -229,7 +229,7 @@ export default function Dashboard() {
             </div>
 
             {/* Quick Tools Section */}
-            <div className="quick-tools-container" style={{ marginTop: "40px", marginBottom: "40px" }}>
+            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md dark:bg-[#0d1628] dark:border-[#1F2937]">
               <h2 className="quick-tools-title">Quick Tools</h2>
               <div className="quick-tools-buttons">
                 <a

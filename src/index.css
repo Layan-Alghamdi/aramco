@@ -1151,34 +1151,18 @@ body.new-team-surface {
   opacity: 0.82;
 }
 
-/* QUICK TOOLS CONTAINER */
-.quick-tools-container {
-  position: relative;
-  width: 100%;
-  padding: 40px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #00a884, #0071bc);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.dark .quick-tools-container,
-:root[data-theme='dark'] .quick-tools-container {
-  background: linear-gradient(135deg, #006b5e, #004a7a);
-  box-shadow: 0 0 32px rgba(0, 168, 132, 0.25);
-}
-
 /* QUICK TOOLS TITLE */
 .quick-tools-title {
-  font-size: 24px;
-  font-weight: 800;
-  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1B1533;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .dark .quick-tools-title,
 :root[data-theme='dark'] .quick-tools-title {
-  color: #ffffff;
+  color: #e2e8f0;
 }
 
 /* QUICK TOOLS BUTTONS CONTAINER */
@@ -1187,19 +1171,7 @@ body.new-team-surface {
   justify-content: center;
   align-items: center;
   gap: 24px;
-  padding: 30px 40px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(24px) saturate(180%);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   width: 100%;
-}
-
-.dark .quick-tools-buttons,
-:root[data-theme='dark'] .quick-tools-buttons {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 0 40px rgba(0, 168, 132, 0.15);
 }
 
 /* QUICK TOOL BUTTON BASE */
