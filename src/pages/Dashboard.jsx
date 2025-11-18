@@ -228,6 +228,31 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Quick Tools Section */}
+            <div className="quick-tools-container" style={{ marginTop: "40px", marginBottom: "40px" }}>
+              <h2 className="quick-tools-title">Quick Tools</h2>
+              <div className="quick-tools-buttons">
+                <a
+                  href="https://outlook.office.com/mail/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="quick-tool-btn outlook-btn"
+                >
+                  <Mail size={24} color="white" />
+                  Outlook
+                </a>
+                <a
+                  href="https://teams.microsoft.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="quick-tool-btn teams-btn"
+                >
+                  <Users size={24} color="white" />
+                  Microsoft Teams
+                </a>
+              </div>
+            </div>
+
             <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -249,58 +274,6 @@ export default function Dashboard() {
               </div>
               <div className="mt-6">
                 <TeamsGrid teams={teams} />
-              </div>
-            </div>
-
-            {/* Quick Tools Section */}
-            <div
-              className="quick-tools-container"
-              style={{
-                marginTop: "55px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "25px"
-              }}
-            >
-              <h3 className="quick-tools-title">Quick Tools</h3>
-
-              <div
-                className="external-tools-wrapper glass-box"
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "45px",
-                  padding: "30px 40px",
-                  borderRadius: "30px",
-                  width: "fit-content"
-                }}
-              >
-                <a
-                  href="https://outlook.office.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="super-btn outlook-btn tilt"
-                >
-                  <span className="icon-animate">
-                    <Mail size={28} />
-                  </span>
-                  Outlook
-                  <span className="wave"></span>
-                </a>
-
-                <a
-                  href="https://teams.microsoft.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="super-btn teams-btn tilt"
-                >
-                  <span className="icon-animate">
-                    <Users size={28} />
-                  </span>
-                  Microsoft Teams
-                  <span className="wave"></span>
-                </a>
               </div>
             </div>
           </div>
