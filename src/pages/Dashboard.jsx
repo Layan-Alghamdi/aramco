@@ -278,7 +278,7 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => navigate("/teams/new")}
-                  className="inline-flex items-center rounded-full bg-[#1B1533] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
+                  className="dashboard-create-team-button inline-flex items-center rounded-full bg-[#1B1533] px-4 py-2 text-xs font-semibold text-white hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition"
                 >
                   Create team
                 </button>

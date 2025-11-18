@@ -1326,4 +1326,23 @@ body.new-team-surface {
   font-weight: 600 !important;
 }
 
+/* DASHBOARD CREATE TEAM BUTTON DARK MODE */
+.dark .dashboard-create-team-button,
+:root[data-theme='dark'] .dashboard-create-team-button {
+  background: linear-gradient(135deg, #2563EF 0%, #539BFF 100%) !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 15px rgba(83, 155, 255, 0.45), 0 0 25px rgba(83, 155, 255, 0.25) !important;
+  transition: 0.25s ease !important;
+}
+
+.dark .dashboard-create-team-button:hover,
+:root[data-theme='dark'] .dashboard-create-team-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 20px rgba(83, 155, 255, 0.6), 0 0 30px rgba(83, 155, 255, 0.35) !important;
+  opacity: 1 !important;
+}
+
 
