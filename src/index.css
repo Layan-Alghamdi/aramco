@@ -1151,11 +1151,10 @@ body.new-team-surface {
   opacity: 0.82;
 }
 
-/* QUICK TOOLS TITLE */
+/* QUICK TOOLS HEADER */
 .quick-tools-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: -5px;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--text-primary, #1a1a1a);
   text-align: center;
 }
@@ -1165,99 +1164,103 @@ body.new-team-surface {
   color: #e2e8f0;
 }
 
-/* LIGHT MODE GLASS */
+/* GLASS BACKGROUND LIGHT MODE */
 .glass-box {
-  backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
   background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* DARK MODE GLASS */
+/* GLASS BACKGROUND DARK MODE */
 .dark .glass-box,
 :root[data-theme='dark'] .glass-box {
-  background: rgba(18, 22, 30, 0.35);
-  box-shadow: 0 0 32px rgba(0, 255, 220, 0.07);
+  background: rgba(18, 26, 35, 0.32);
+  box-shadow: 0 0 28px rgba(0, 255, 220, 0.10);
 }
 
-/* SUPER BUTTON BASE */
+/* SUPER BUTTON BASE STYLE */
 .super-btn {
   position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 20px 46px;
+  padding: 22px 55px;
   border-radius: 50px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: white;
   cursor: pointer;
-  overflow: hidden;
   transition: 0.4s ease;
   transform-style: preserve-3d;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
   text-decoration: none;
-  border: none;
+  overflow: hidden;
 }
 
 /* ICON SIZE */
 .super-btn svg {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
-/* OUTLOOK STYLE */
+/* ✨ ICON ANIMATION */
+.icon-animate {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.super-btn:hover .icon-animate {
+  transform: translateY(-3px) scale(1.1);
+  opacity: 0.9;
+}
+
+/* 🌈 THEMED COLOR BUTTONS */
 .outlook-btn {
-  background: linear-gradient(135deg, #1e90ff, #0066cc);
-  box-shadow: 0 0 22px rgba(30, 144, 255, 0.55);
+  background: linear-gradient(135deg, #00c9a7, #0099ff);
+  box-shadow: 0 0 22px rgba(0, 153, 255, 0.55);
 }
 
-/* TEAMS STYLE */
 .teams-btn {
-  background: linear-gradient(135deg, #726bff, #4338ca);
-  box-shadow: 0 0 22px rgba(99, 91, 255, 0.55);
+  background: linear-gradient(135deg, #0099ff, #006b5e);
+  box-shadow: 0 0 22px rgba(0, 201, 167, 0.55);
 }
 
-/* HOVER 3D POP */
-.super-btn:hover {
-  transform: scale(1.07) rotateX(6deg) rotateY(-6deg);
+/* DARK MODE STRONGER GLOW */
+.dark .outlook-btn,
+:root[data-theme='dark'] .outlook-btn {
+  box-shadow: 0 0 32px rgba(0, 153, 255, 0.85);
 }
 
-/* WAVE SHIMMER */
+.dark .teams-btn,
+:root[data-theme='dark'] .teams-btn {
+  box-shadow: 0 0 32px rgba(0, 201, 167, 0.85);
+}
+
+/* 🌊 WAVE OVERLAY ANIMATION */
 .super-btn .wave {
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 200%;
+  left: -120%;
+  width: 220%;
   height: 100%;
   background: rgba(255, 255, 255, 0.20);
-  transform: skewX(-25deg);
+  transform: skewX(-20deg);
   transition: 0.6s ease;
   pointer-events: none;
 }
 
 .super-btn:hover .wave {
-  left: 100%;
+  left: 120%;
 }
 
-/* DARK MODE NEON BOOST */
-.dark .super-btn,
-:root[data-theme='dark'] .super-btn {
-  box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
-}
-
-.dark .outlook-btn,
-:root[data-theme='dark'] .outlook-btn {
-  box-shadow: 0 0 30px rgba(30, 144, 255, 0.75);
-}
-
-.dark .teams-btn,
-:root[data-theme='dark'] .teams-btn {
-  box-shadow: 0 0 30px rgba(99, 91, 255, 0.75);
-}
-
-/* 3D TILT BASE */
+/* 🌀 3D TILT EFFECT */
 .tilt {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tilt:hover {
+  transform: scale(1.07) rotateX(6deg) rotateY(-6deg);
 }
 

@@ -282,7 +282,9 @@ export default function Dashboard() {
                   rel="noopener noreferrer"
                   className="super-btn outlook-btn tilt"
                 >
-                  <Mail size={26} />
+                  <span className="icon-animate">
+                    <Mail size={28} />
+                  </span>
                   Outlook
                   <span className="wave"></span>
                 </a>
@@ -293,7 +295,9 @@ export default function Dashboard() {
                   rel="noopener noreferrer"
                   className="super-btn teams-btn tilt"
                 >
-                  <Users size={26} />
+                  <span className="icon-animate">
+                    <Users size={28} />
+                  </span>
                   Microsoft Teams
                   <span className="wave"></span>
                 </a>
