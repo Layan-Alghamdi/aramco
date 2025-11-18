@@ -5,6 +5,7 @@ import { slideTemplateMap } from "../data/templates";
 import SharedHeader from "@/components/SharedHeader";
 import Toast from "@/components/Toast";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import useThemeMode from "@/hooks/useThemeMode";
 
 const backgroundLayers = [
   "linear-gradient(110deg, #0C7C59 0%, #00A19A 40%, #3E6DCC 100%)",
@@ -31,6 +32,8 @@ export default function Projects() {
   const location = useLocation();
   const { projects, removeProject } = useProjects();
   const currentUser = useCurrentUser();
+  const themeMode = useThemeMode();
+  const isDarkMode = themeMode === "dark";
 
   const [highlightId, setHighlightId] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
@@ -64,6 +67,17 @@ export default function Projects() {
     const timeout = setTimeout(() => setToast(""), 2400);
     return () => clearTimeout(timeout);
   }, [toast]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("projects-surface", "dark-projects");
+    } else {
+      document.body.classList.remove("projects-surface", "dark-projects");
+    }
+    return () => {
+      document.body.classList.remove("projects-surface", "dark-projects");
+    };
+  }, [isDarkMode]);
 
   const orderedProjects = useMemo(() => {
     return [...projects].sort((a, b) => {

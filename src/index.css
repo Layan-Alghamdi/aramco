@@ -897,7 +897,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-wrapper,
 .dark body.dark-about .notifications-nav-wrapper,
 .dark body.dark-dashboard .notifications-nav-wrapper,
-.dark body.dark-new-team .notifications-nav-wrapper {
+.dark body.dark-new-team .notifications-nav-wrapper,
+.dark body.dark-projects .notifications-nav-wrapper {
   margin-bottom: 40px;
 }
 
@@ -907,11 +908,19 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav,
 .dark body.dark-about .notifications-nav,
 .dark body.dark-dashboard .notifications-nav,
-.dark body.dark-new-team .notifications-nav {
+.dark body.dark-new-team .notifications-nav,
+.dark body.dark-projects .notifications-nav {
   background: #0b1524;
   border-bottom: 1px solid var(--notif-navbar-border);
   box-shadow: var(--notif-navbar-shadow);
   border-radius: 0;
+}
+
+/* PROJECTS PAGE HEADER DARK MODE - SPECIFIC STYLING */
+.dark body.dark-projects .notifications-nav {
+  background-color: #0F172A !important;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05) !important;
+  height: 76px !important;
 }
 
 .dark body.dark-notifications .notifications-nav-inner,
@@ -920,10 +929,17 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-inner,
 .dark body.dark-about .notifications-nav-inner,
 .dark body.dark-dashboard .notifications-nav-inner,
-.dark body.dark-new-team .notifications-nav-inner {
+.dark body.dark-new-team .notifications-nav-inner,
+.dark body.dark-projects .notifications-nav-inner {
   max-width: 1280px;
   padding-inline: 40px;
   height: 100%;
+}
+
+/* PROJECTS PAGE HEADER INNER - SPECIFIC STYLING */
+.dark body.dark-projects .notifications-nav-inner {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
 }
 
 .dark body.dark-notifications .notifications-nav-logo,
@@ -932,9 +948,15 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-logo,
 .dark body.dark-about .notifications-nav-logo,
 .dark body.dark-dashboard .notifications-nav-logo,
-.dark body.dark-new-team .notifications-nav-logo {
+.dark body.dark-new-team .notifications-nav-logo,
+.dark body.dark-projects .notifications-nav-logo {
   filter: brightness(1.1);
   height: 40px !important;
+}
+
+/* PROJECTS PAGE LOGO - ENHANCED VISIBILITY */
+.dark body.dark-projects .notifications-nav-logo {
+  filter: brightness(1.1) contrast(1.1) !important;
 }
 
 .dark body.dark-notifications .notifications-nav-list,
@@ -943,7 +965,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-list,
 .dark body.dark-about .notifications-nav-list,
 .dark body.dark-dashboard .notifications-nav-list,
-.dark body.dark-new-team .notifications-nav-list {
+.dark body.dark-new-team .notifications-nav-list,
+.dark body.dark-projects .notifications-nav-list {
   color: var(--notif-navbar-text-muted);
   gap: 32px;
   font-size: 15px;
@@ -955,16 +978,19 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-link,
 .dark body.dark-about .notifications-nav-link,
 .dark body.dark-dashboard .notifications-nav-link,
-.dark body.dark-new-team .notifications-nav-link {
+.dark body.dark-new-team .notifications-nav-link,
+.dark body.dark-projects .notifications-nav-link {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #cbd5e1;
-  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  padding-inline: 18px;
-  padding-block: 8px;
-  border-radius: 999px;
+}
+
+/* PROJECTS PAGE NAV LINKS - SPECIFIC STYLING */
+.dark body.dark-projects .notifications-nav-link {
+  color: #E2E8F0 !important;
+  font-weight: 500 !important;
 }
 
 .dark body.dark-notifications .notifications-nav-link--idle,
@@ -973,7 +999,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-link--idle,
 .dark body.dark-about .notifications-nav-link--idle,
 .dark body.dark-dashboard .notifications-nav-link--idle,
-.dark body.dark-new-team .notifications-nav-link--idle {
+.dark body.dark-new-team .notifications-nav-link--idle,
+.dark body.dark-projects .notifications-nav-link--idle {
   color: #cbd5e1;
 }
 
@@ -990,10 +1017,18 @@ body.new-team-surface {
 .dark body.dark-dashboard .notifications-nav-link--idle:hover,
 .dark body.dark-dashboard .notifications-nav-link:focus-visible,
 .dark body.dark-new-team .notifications-nav-link--idle:hover,
-.dark body.dark-new-team .notifications-nav-link:focus-visible {
+.dark body.dark-new-team .notifications-nav-link:focus-visible,
+.dark body.dark-projects .notifications-nav-link--idle:hover,
+.dark body.dark-projects .notifications-nav-link:focus-visible {
   color: #ffffff;
   background: var(--notif-navbar-hover-bg);
   box-shadow: 0 0 10px rgba(30, 144, 255, 0.3);
+}
+
+/* PROJECTS PAGE NAV LINKS HOVER - SPECIFIC STYLING */
+.dark body.dark-projects .notifications-nav-link--idle:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 
 .dark body.dark-notifications .notifications-nav-link:focus-visible,
@@ -1002,7 +1037,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-link:focus-visible,
 .dark body.dark-about .notifications-nav-link:focus-visible,
 .dark body.dark-dashboard .notifications-nav-link:focus-visible,
-.dark body.dark-new-team .notifications-nav-link:focus-visible {
+.dark body.dark-new-team .notifications-nav-link:focus-visible,
+.dark body.dark-projects .notifications-nav-link:focus-visible {
   outline: 1px solid var(--notif-navbar-outline);
   outline-offset: 2px;
 }
@@ -1013,11 +1049,20 @@ body.new-team-surface {
 .dark body.dark-home .notifications-nav-link--active,
 .dark body.dark-about .notifications-nav-link--active,
 .dark body.dark-dashboard .notifications-nav-link--active,
-.dark body.dark-new-team .notifications-nav-link--active {
+.dark body.dark-new-team .notifications-nav-link--active,
+.dark body.dark-projects .notifications-nav-link--active {
   color: #ffffff;
   background: #112240;
   box-shadow: 0 0 10px rgba(30, 144, 255, 0.3);
   border: 1px solid rgba(102, 154, 241, 0.32);
+}
+
+/* PROJECTS PAGE ACTIVE NAV ITEM - SPECIFIC STYLING */
+.dark body.dark-projects .notifications-nav-link--active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
+  padding: 8px 18px !important;
 }
 
 .dark body.dark-notifications .notifications-profile-trigger,
@@ -1027,13 +1072,23 @@ body.new-team-surface {
 .dark body.dark-home .notifications-profile-trigger,
 .dark body.dark-about .notifications-profile-trigger,
 .dark body.dark-dashboard .notifications-profile-trigger,
-.dark body.dark-new-team .notifications-profile-trigger {
+.dark body.dark-new-team .notifications-profile-trigger,
+.dark body.dark-projects .notifications-profile-trigger {
   border: 1px solid var(--notif-control-border);
   background: #112240;
   color: #ffffff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 22px rgba(6, 16, 36, 0.4);
   min-height: 40px;
   padding-inline: 14px;
+}
+
+/* PROJECTS PAGE PROFILE CARD - SPECIFIC STYLING */
+.dark body.dark-projects .notifications-profile-trigger {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .dark body.dark-notifications .notifications-profile-trigger:hover,
@@ -1043,7 +1098,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-profile-trigger:hover,
 .dark body.dark-about .notifications-profile-trigger:hover,
 .dark body.dark-dashboard .notifications-profile-trigger:hover,
-.dark body.dark-new-team .notifications-profile-trigger:hover {
+.dark body.dark-new-team .notifications-profile-trigger:hover,
+.dark body.dark-projects .notifications-profile-trigger:hover {
   background: var(--notif-control-hover);
 }
 
@@ -1054,7 +1110,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-profile-trigger:focus-visible,
 .dark body.dark-about .notifications-profile-trigger:focus-visible,
 .dark body.dark-dashboard .notifications-profile-trigger:focus-visible,
-.dark body.dark-new-team .notifications-profile-trigger:focus-visible {
+.dark body.dark-new-team .notifications-profile-trigger:focus-visible,
+.dark body.dark-projects .notifications-profile-trigger:focus-visible {
   outline: 1px solid var(--notif-navbar-outline);
   outline-offset: 2px;
 }
@@ -1065,7 +1122,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-profile-menu,
 .dark body.dark-about .notifications-profile-menu,
 .dark body.dark-dashboard .notifications-profile-menu,
-.dark body.dark-new-team .notifications-profile-menu {
+.dark body.dark-new-team .notifications-profile-menu,
+.dark body.dark-projects .notifications-profile-menu {
   background: var(--notif-menu-bg);
   border: 1px solid var(--notif-menu-border);
   color: var(--notif-navbar-text);
@@ -1079,7 +1137,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-profile-copy,
 .dark body.dark-about .notifications-profile-copy,
 .dark body.dark-dashboard .notifications-profile-copy,
-.dark body.dark-new-team .notifications-profile-copy {
+.dark body.dark-new-team .notifications-profile-copy,
+.dark body.dark-projects .notifications-profile-copy {
   color: var(--notif-navbar-text);
 }
 
@@ -1089,7 +1148,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-menu-item,
 .dark body.dark-about .notifications-menu-item,
 .dark body.dark-dashboard .notifications-menu-item,
-.dark body.dark-new-team .notifications-menu-item {
+.dark body.dark-new-team .notifications-menu-item,
+.dark body.dark-projects .notifications-menu-item {
   transition: background-color 0.2s ease, color 0.2s ease;
   border-radius: 12px;
   font-weight: 500;
@@ -1102,7 +1162,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-menu-item:hover,
 .dark body.dark-about .notifications-menu-item:hover,
 .dark body.dark-dashboard .notifications-menu-item:hover,
-.dark body.dark-new-team .notifications-menu-item:hover {
+.dark body.dark-new-team .notifications-menu-item:hover,
+.dark body.dark-projects .notifications-menu-item:hover {
   background: var(--notif-menu-item-hover);
 }
 
@@ -1112,7 +1173,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-menu-item:focus-visible,
 .dark body.dark-about .notifications-menu-item:focus-visible,
 .dark body.dark-dashboard .notifications-menu-item:focus-visible,
-.dark body.dark-new-team .notifications-menu-item:focus-visible {
+.dark body.dark-new-team .notifications-menu-item:focus-visible,
+.dark body.dark-projects .notifications-menu-item:focus-visible {
   outline: 1px solid var(--notif-navbar-outline);
   outline-offset: 1px;
 }
@@ -1123,7 +1185,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-signout,
 .dark body.dark-about .notifications-signout,
 .dark body.dark-dashboard .notifications-signout,
-.dark body.dark-new-team .notifications-signout {
+.dark body.dark-new-team .notifications-signout,
+.dark body.dark-projects .notifications-signout {
   background: var(--notif-signout-bg);
   border: 1px solid var(--notif-signout-border);
   color: var(--notif-signout-text);
@@ -1136,7 +1199,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-signout:hover,
 .dark body.dark-about .notifications-signout:hover,
 .dark body.dark-dashboard .notifications-signout:hover,
-.dark body.dark-new-team .notifications-signout:hover {
+.dark body.dark-new-team .notifications-signout:hover,
+.dark body.dark-projects .notifications-signout:hover {
   background: rgba(223, 96, 96, 0.28);
   border-color: rgba(255, 142, 142, 0.52);
 }
@@ -1147,7 +1211,8 @@ body.new-team-surface {
 .dark body.dark-home .notifications-signout span,
 .dark body.dark-about .notifications-signout span,
 .dark body.dark-dashboard .notifications-signout span,
-.dark body.dark-new-team .notifications-signout span {
+.dark body.dark-new-team .notifications-signout span,
+.dark body.dark-projects .notifications-signout span {
   opacity: 0.82;
 }
 
