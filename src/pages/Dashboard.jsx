@@ -229,10 +229,10 @@ export default function Dashboard() {
             </div>
 
             {/* Quick Tools Section */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md dark:bg-[#0d1628] dark:border-[#1F2937]">
-              <div className="text-center mb-6">
-                <h2 className="text-lg font-semibold text-[#1B1533] mb-2 dark:text-[#E2E8F0]">Quick Tools</h2>
-                <p className="text-sm text-[#6B7280] dark:text-[#9CA3AF]">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-4 shadow-md dark:bg-[#0d1628] dark:border-[#1F2937]">
+              <div className="text-center mb-3">
+                <h2 className="text-lg font-semibold text-[#1B1533] mb-1 dark:text-[#E2E8F0]">Quick Tools</h2>
+                <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF]">
                   Access your essential work tools quickly — stay connected and collaborate faster.
                 </p>
               </div>
