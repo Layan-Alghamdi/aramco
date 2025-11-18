@@ -17,6 +17,7 @@ import EditTeam from "./pages/EditTeam";
 import ChangePassword from "./pages/ChangePassword";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import ThemePreferences from "./pages/ThemePreferences";
+import ChatAssistant from "./components/ChatAssistant";
 import {
   applyTheme,
   initializeTheme,
@@ -63,8 +64,9 @@ export default function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
       <Route path="/notifications" element={<Notifications />} />
       <Route path="/features" element={<Features />} />
       <Route path="/about" element={<About />} />
@@ -166,7 +168,9 @@ export default function App() {
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+      <ChatAssistant />
+    </>
   );
 }
 

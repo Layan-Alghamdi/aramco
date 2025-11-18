@@ -4,6 +4,8 @@ import { useProjects } from "../context/ProjectsContext";
 import { cloneTemplateSlides, slideTemplates } from "../data/templates";
 import logo from "../../pic/aramco_digital_logo_transparent-removebg-preview.png";
 import VideoPlayer from "../components/VideoPlayer";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { recordProjectForUser } from "@/lib/usersStore";
 
 const uuid = () => (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `id-${Math.random().toString(36).slice(2)}`);
 
@@ -76,29 +78,54 @@ const defaultSlide = () => ({
 export default function Editor() {
   const navigate = useNavigate();
   const { projectId } = useParams();
-  const { projects, updateProject } = useProjects();
+  const { projects, updateProject, addProject } = useProjects();
+  const currentUser = useCurrentUser();
 
   const initialProject = useMemo(() => projects.find((item) => item.id === projectId), [projects, projectId]);
 
-  // Project state with editable title
+  // Project state with editable title (current editing state)
   const [project, setProject] = useState({
-    id: initialProject?.id || "",
+    id: initialProject?.id || projectId || "",
     title: initialProject?.name || "Untitled project",
     description: initialProject?.description || "",
+    templateId: initialProject?.templateId || slideTemplates[0].id,
     slides: initialProject?.slides || []
+  });
+
+  // Last saved draft state (snapshot saved with Save button)
+  const [lastSavedProject, setLastSavedProject] = useState(() => {
+    if (initialProject) {
+      return {
+        id: initialProject.id,
+        title: initialProject.name || "Untitled project",
+        description: initialProject.description || "",
+        templateId: initialProject.templateId || slideTemplates[0].id,
+        slides: initialProject.slides || []
+      };
+    }
+    return null;
   });
 
   // Update project state when initialProject changes
   useEffect(() => {
     if (initialProject) {
-      setProject({
+      const projectData = {
         id: initialProject.id,
         title: initialProject.name || "Untitled project",
         description: initialProject.description || "",
+        templateId: initialProject.templateId || slideTemplates[0].id,
         slides: initialProject.slides || []
-      });
+      };
+      setProject(projectData);
+      setLastSavedProject(projectData);
+    } else if (projectId && !project.id) {
+      // If we have a projectId but no initialProject, set the id
+      setProject((prev) => ({
+        ...prev,
+        id: projectId
+      }));
     }
-  }, [initialProject]);
+  }, [initialProject, projectId, project.id]);
 
   const [slides, setSlides] = useState(() => project?.slides ?? [defaultSlide()]);
   const [activeSlideId, setActiveSlideId] = useState(() => slides[0]?.id);
@@ -110,11 +137,18 @@ export default function Editor() {
   });
   const [recentColors, setRecentColors] = useState([]);
   const [isOffline, setIsOffline] = useState(typeof window !== "undefined" ? !navigator.onLine : false);
-  const [saving, setSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [saveState, setSaveState] = useState("saved");
   const [lastSavedAt, setLastSavedAt] = useState(() => Date.now());
   const [pendingChanges, setPendingChanges] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [showLeftPanel, setShowLeftPanel] = useState(true);
+  const [showRightPanel, setShowRightPanel] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [aiInsights, setAiInsights] = useState({});
   const [highlightedIssueId, setHighlightedIssueId] = useState(null);
   const [aiSuggestions, setAiSuggestions] = useState([]);
@@ -156,6 +190,18 @@ export default function Editor() {
     () => slides.find((slide) => slide.id === activeSlideId) ?? slides[0],
     [slides, activeSlideId]
   );
+
+  // Handle smooth slide transitions
+  useEffect(() => {
+    if (!activeSlideId) return;
+    
+    setIsTransitioning(true);
+    const timer = setTimeout(() => {
+      setIsTransitioning(false);
+    }, 200); // 200ms transition duration
+
+    return () => clearTimeout(timer);
+  }, [activeSlideId]);
 
   const selectedObjects = useMemo(() => {
     if (!activeSlide) return [];
@@ -426,29 +472,107 @@ export default function Editor() {
     }
   }, [pendingStorageKey]);
 
+  // Save draft locally (does not publish to Projects list)
   const performSave = useCallback(async () => {
-    if (!project.id || isOffline) return;
-    setSaving(true);
+    if (isOffline || isSaving) return;
+    
+    setIsSaving(true);
     setSaveState("saving");
     try {
-      await updateProject(project.id, {
-        name: project.title,
-        description: project.description,
-        slides: slidesRef.current,
-        updatedAt: new Date().toISOString()
-      });
+      // Save current state as draft snapshot
+      const draftSnapshot = {
+        id: project.id || projectId || "",
+        title: project.title || "Untitled project",
+        description: project.description || "",
+        templateId: project.templateId || slideTemplates[0].id,
+        slides: [...slidesRef.current]
+      };
+      
+      setLastSavedProject(draftSnapshot);
       setLastSavedAt(Date.now());
       setPendingChanges(false);
       setSaveState("saved");
+      setHasUnsavedChanges(false);
+      setIsSaved(true);
       clearPendingSlides();
     } catch (error) {
-      console.error("Failed to save project", error);
+      console.error("Failed to save draft", error);
       setSaveState("error");
+      setIsSaved(false);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
       saveTimeoutRef.current = null;
     }
-  }, [project, isOffline, updateProject, clearPendingSlides]);
+  }, [project, projectId, isOffline, isSaving, clearPendingSlides]);
+
+  // Publish to Projects list (called when leaving editor)
+  const publishToProjects = useCallback(async (useCurrentState = false) => {
+    // Use lastSavedProject if available and not forcing current state, otherwise use current project
+    const projectToPublish = (!useCurrentState && lastSavedProject) ? lastSavedProject : {
+      id: project.id || projectId || "",
+      title: project.title || "Untitled project",
+      description: project.description || "",
+      templateId: project.templateId || slideTemplates[0].id,
+      slides: slidesRef.current
+    };
+
+    const targetProjectId = projectToPublish.id;
+    if (!targetProjectId) {
+      console.error("Cannot publish: no project ID");
+      return;
+    }
+
+    try {
+      const projectExists = projects.some((p) => p.id === targetProjectId);
+      
+      if (projectExists) {
+        // Update existing project in Projects list
+        updateProject(targetProjectId, {
+          name: projectToPublish.title,
+          description: projectToPublish.description,
+          slides: projectToPublish.slides,
+          updatedAt: new Date().toISOString()
+        });
+      } else {
+        // Create new project in Projects list
+        const newProject = addProject({
+          id: targetProjectId,
+          name: projectToPublish.title,
+          description: projectToPublish.description,
+          templateId: projectToPublish.templateId || slideTemplates[0].id,
+          slides: projectToPublish.slides,
+          status: "Draft",
+          ownerId: currentUser?.id ?? null,
+          ownerName: currentUser?.name ?? "You",
+          ownerEmail: currentUser?.email ?? "",
+          ownerRole: currentUser?.role ?? ""
+        });
+
+        if (currentUser?.id) {
+          recordProjectForUser(currentUser.id, newProject.id);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to publish project", error);
+    }
+  }, [lastSavedProject, project, projectId, projects, updateProject, addProject, currentUser]);
+
+  // Revert to last saved draft
+  const revertToLastSaved = useCallback(() => {
+    if (!lastSavedProject) return;
+    
+    setProject({
+      id: lastSavedProject.id,
+      title: lastSavedProject.title,
+      description: lastSavedProject.description,
+      templateId: lastSavedProject.templateId,
+      slides: lastSavedProject.slides
+    });
+    setSlides(lastSavedProject.slides);
+    setActiveSlideId(lastSavedProject.slides[0]?.id);
+    setHasUnsavedChanges(false);
+    setIsSaved(true);
+  }, [lastSavedProject]);
 
   const scheduleSave = useCallback(
     (immediate = false) => {
@@ -983,30 +1107,52 @@ export default function Editor() {
     };
   }, []);
 
+  // Track unsaved changes when slides or project title changes (compare with lastSavedProject)
   useEffect(() => {
-    if (!initialProject) return;
-    setPendingChanges(true);
-    if (isOffline) {
-      cachePendingSlides();
-    } else {
-      setSaveState("saving");
-      scheduleSave();
-    }
-  }, [slides, initialProject, isOffline, cachePendingSlides, scheduleSave]);
-
-  useEffect(() => {
-    if (isOffline) return;
-    const interval = window.setInterval(() => {
-      if (pendingChanges) {
-        scheduleSave(true);
+    if (!lastSavedProject) {
+      // If no saved draft yet, check if we have any changes from initial
+      if (initialProject) {
+        const slidesChanged = JSON.stringify(slides) !== JSON.stringify(initialProject.slides || []);
+        const titleChanged = project.title !== (initialProject.name || "Untitled project");
+        setHasUnsavedChanges(slidesChanged || titleChanged);
+      } else {
+        // New project, check if we have any content
+        const hasContent = slides.length > 0 && slides[0].objects.length > 0;
+        const hasTitle = project.title && project.title !== "Untitled project";
+        setHasUnsavedChanges(hasContent || hasTitle);
       }
-    }, 10000);
-    return () => window.clearInterval(interval);
-  }, [pendingChanges, isOffline, scheduleSave]);
+      return;
+    }
+    
+    // Compare current state with last saved draft
+    const slidesChanged = JSON.stringify(slides) !== JSON.stringify(lastSavedProject.slides || []);
+    const titleChanged = project.title !== lastSavedProject.title;
+    const descriptionChanged = project.description !== lastSavedProject.description;
+    const hasChanges = slidesChanged || titleChanged || descriptionChanged;
+    setHasUnsavedChanges(hasChanges);
+    
+    // Reset saved state when there are unsaved changes
+    if (hasChanges && isSaved) {
+      setIsSaved(false);
+    }
+  }, [slides, project.title, project.description, lastSavedProject, initialProject, isSaved]);
 
+  // AUTO-SAVE DISABLED: Manual save only
+  // useEffect(() => {
+  //   if (isOffline) return;
+  //   const interval = window.setInterval(() => {
+  //     if (pendingChanges) {
+  //       scheduleSave(true);
+  //     }
+  //   }, 10000);
+  //   return () => window.clearInterval(interval);
+  // }, [pendingChanges, isOffline, scheduleSave]);
+
+  // AUTO-SAVE DISABLED: Manual save only
   useEffect(() => {
     const handleOnline = () => {
       setIsOffline(false);
+      // Restore cached slides but don't auto-save
       if (!pendingStorageKey || typeof window === "undefined") return;
       const cached = localStorage.getItem(pendingStorageKey);
       if (cached) {
@@ -1015,15 +1161,13 @@ export default function Editor() {
           if (parsed?.slides) {
             setSlides(parsed.slides);
             clearPendingSlides();
-            setPendingChanges(true);
-            scheduleSave(true);
+            setHasUnsavedChanges(true); // Mark as unsaved so user can save manually
           }
         } catch (error) {
           console.warn("Unable to restore pending slides", error);
         }
-      } else {
-        scheduleSave(true);
       }
+      // AUTO-SAVE REMOVED: scheduleSave(true);
     };
 
     const handleOffline = () => {
@@ -1039,7 +1183,7 @@ export default function Editor() {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [cachePendingSlides, clearPendingSlides, pendingStorageKey, scheduleSave]);
+  }, [cachePendingSlides, clearPendingSlides, pendingStorageKey]);
 
   useEffect(() => {
     const handleKeyDelete = (event) => {
@@ -1078,18 +1222,21 @@ export default function Editor() {
     return `${hours} hour${hours === 1 ? "" : "s"} ago`;
   }, [lastSavedAt]);
 
-  const statusMeta = useMemo(() => {
-    if (isOffline) {
-      return {
-        icon: "⚠️",
-        label: pendingChanges ? "Offline – changes pending sync" : "Offline"
-      };
-    }
-    if (saveState === "saving") {
-      return { icon: "🌀", label: "Saving..." };
-    }
-    return { icon: "✅", label: "All changes saved" };
-  }, [isOffline, pendingChanges, saveState]);
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   const currentFontSize = selectedTextObject?.fontSize ?? DEFAULT_TEXT_PROPS.fontSize;
   const currentBold = (selectedTextObject?.fontWeight ?? DEFAULT_TEXT_PROPS.fontWeight) >= 600;
@@ -1158,15 +1305,26 @@ export default function Editor() {
         style={{ background: "radial-gradient(120% 120% at 100% 100%, rgba(12,124,89,0.38) 0%, rgba(62,109,204,0.18) 35%, rgba(62,109,204,0) 70%)" }}
       />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-8 py-8 gap-6">
+      <div className="relative z-10 flex h-screen flex-col">
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageFileChange} className="hidden" />
         <input type="file" accept="video/mp4,video/quicktime,video/webm" ref={videoFileInputRef} onChange={handleVideoFileChange} className="hidden" />
 
-        <header className="flex items-center justify-between rounded-3xl bg-white/80 px-6 py-4 shadow-[0_18px_45px_rgba(32,64,128,0.18)] backdrop-blur-lg">
+        <header className="flex-shrink-0 flex items-center justify-between bg-white/80 px-6 py-3 shadow-[0_2px_8px_rgba(32,64,128,0.1)] backdrop-blur-lg border-b border-white/20">
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => navigate("/projects", { state: { highlightProjectId: project.id } })}
+              onClick={async () => {
+                if (hasUnsavedChanges) {
+                  setPendingNavigation(() => async () => {
+                    await publishToProjects();
+                    navigate("/projects", { state: { highlightProjectId: project.id || projectId } });
+                  });
+                  setShowLeaveDialog(true);
+                } else {
+                  await publishToProjects();
+                  navigate("/projects", { state: { highlightProjectId: project.id || projectId } });
+                }
+              }}
               className="flex items-center gap-2 rounded-full bg-[#3E6DCC]/10 px-4 py-2 text-sm font-medium text-[#3E6DCC] hover:bg-[#3E6DCC]/15 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -1184,8 +1342,7 @@ export default function Editor() {
                   onChange={(e) => setProject((prev) => ({ ...prev, title: e.target.value }))}
                   onBlur={() => {
                     setIsEditingTitle(false);
-                    setPendingChanges(true);
-                    scheduleSave();
+                    setHasUnsavedChanges(true);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -1193,6 +1350,7 @@ export default function Editor() {
                     } else if (e.key === "Escape") {
                       setProject((prev) => ({ ...prev, title: initialProject?.name || "Untitled project" }));
                       setIsEditingTitle(false);
+                      setHasUnsavedChanges(false);
                     }
                   }}
                   className="text-lg font-semibold text-[#1E1E1E] bg-transparent border-b-2 border-[#3E6DCC] focus:outline-none focus:border-[#2853b2] min-w-[200px]"
@@ -1211,27 +1369,37 @@ export default function Editor() {
           </div>
           <img src={logo} alt="Aramco Digital" className="h-12 md:h-14 w-auto" />
           <div className="flex items-center gap-3">
-            <div
-              className="flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-[#1E1E1E] shadow-sm"
-              title={`Last saved: ${relativeLastSaved}`}
-            >
-              <span>{statusMeta.icon}</span>
-              <span>{statusMeta.label}</span>
-            </div>
+            {lastSavedProject && (
+              <button
+                type="button"
+                onClick={revertToLastSaved}
+                disabled={!hasUnsavedChanges}
+                className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition ${
+                  !hasUnsavedChanges
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white text-[#6B7280] hover:bg-gray-50 border border-[#D1D5DB]"
+                }`}
+                title="Revert to last saved draft"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                Revert
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => {
-                setPendingChanges(true);
-                scheduleSave(true);
+              onClick={async () => {
+                await performSave();
               }}
-              disabled={saving || isOffline}
+              disabled={isSaving || isOffline || isSaved}
               className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow transition ${
-                saving || isOffline
+                isSaving || isOffline || isSaved
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#3E6DCC] text-white hover:bg-[#2853b2]"
               }`}
             >
-              {saving ? (
+              {isSaving ? (
                 <>
                   <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -1239,10 +1407,19 @@ export default function Editor() {
                   </svg>
                   Saving...
                 </>
-              ) : (
+              ) : isSaved ? (
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Saved
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
                   </svg>
                   Save
                 </>
@@ -1268,7 +1445,61 @@ export default function Editor() {
           </div>
         </header>
 
-        <div className="rounded-3xl bg-white/75 px-6 py-4 shadow-[0_16px_36px_rgba(32,64,128,0.16)] backdrop-blur flex flex-wrap items-center gap-6">
+        {/* Confirmation Dialog */}
+        {showLeaveDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="relative w-full max-w-md mx-4 bg-white rounded-3xl shadow-2xl p-6">
+              <h3 className="text-lg font-semibold text-[#1E1E1E] mb-2">Unsaved Changes</h3>
+              <p className="text-sm text-[#6B7280] mb-6">
+                You have unsaved changes. What would you like to do?
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await performSave();
+                    setShowLeaveDialog(false);
+                    if (pendingNavigation) {
+                      await pendingNavigation();
+                      setPendingNavigation(null);
+                    }
+                  }}
+                  disabled={isSaving}
+                  className="w-full rounded-full bg-[#3E6DCC] px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#2853b2] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSaving ? "Saving..." : "Save and leave"}
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setShowLeaveDialog(false);
+                    if (pendingNavigation) {
+                      // Publish current state (not saved draft) before leaving
+                      await publishToProjects(true);
+                      await pendingNavigation();
+                      setPendingNavigation(null);
+                    }
+                  }}
+                  className="w-full rounded-full border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-semibold text-[#374151] shadow-sm hover:bg-gray-50 transition"
+                >
+                  Leave without saving
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLeaveDialog(false);
+                    setPendingNavigation(null);
+                  }}
+                  className="w-full rounded-full border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-medium text-[#6B7280] hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-shrink-0 rounded-none bg-white/75 px-6 py-3 shadow-[0_2px_8px_rgba(32,64,128,0.1)] backdrop-blur flex flex-wrap items-center gap-6 border-b border-white/20">
           <ToolbarSection title="Text">
             <button
               type="button"
@@ -1441,66 +1672,93 @@ export default function Editor() {
           </ToolbarSection>
         </div>
 
-        <div className="flex flex-1 gap-6">
-          <aside className="w-[240px] rounded-3xl bg-white/85 p-4 shadow-[0_18px_40px_rgba(32,64,128,0.14)] backdrop-blur space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide">Slides</h2>
-              <button
-                type="button"
-                onClick={addBlankSlide}
-                className="rounded-full bg-[#3E6DCC] text-white text-xs px-3 py-1.5 font-semibold shadow hover:bg-[#2f5cc4]"
-              >
-                New
-              </button>
+        <div className="flex flex-1 gap-0 relative overflow-hidden min-h-0">
+          {/* Left edge toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowLeftPanel((prev) => !prev)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center gap-1.5 rounded-r-full bg-white/95 hover:bg-white border border-l-0 border-[#3E6DCC]/30 shadow-lg transition-all px-2 py-4 min-h-[80px]"
+            title={showLeftPanel ? "Hide slides panel" : "Show slides panel"}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#3E6DCC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {showLeftPanel ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+              )}
+            </svg>
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-[9px] font-semibold text-[#3E6DCC] uppercase tracking-wider leading-tight">
+                {showLeftPanel ? "Hide" : "Show"}
+              </span>
+              <span className="text-[9px] font-semibold text-[#3E6DCC] uppercase tracking-wider leading-tight">
+                Slides
+              </span>
             </div>
-            <div className="space-y-3">
-              {slides.map((slide, index) => {
-                const isActive = slide.id === activeSlideId;
-                return (
-                  <div
-                    key={slide.id}
-                    className={`rounded-2xl border p-3 transition relative ${
-                      isActive ? "border-[#3E6DCC] bg-[#F0F4FF]" : "border-transparent bg-white hover:border-[#C5D4F7]"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setActiveSlideId(slide.id)}
-                      className="w-full text-left"
-                    >
-                      <div className="text-xs uppercase tracking-wide text-[#93A3C3]">Slide {index + 1}</div>
-                      <div className="text-sm font-semibold text-[#1E1E1E] max-h-12 overflow-hidden">
-                        {slide.title || "Untitled"}
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteSlide(slide.id)}
-                      className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#6B7280] shadow hover:text-[#EF4444]"
-                    >
-                      ×
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </aside>
+          </button>
 
-          <main className="flex-1 flex items-center justify-center">
-            <div className="relative w-full max-w-[1040px]" onMouseDown={handleCanvasBackgroundClick}>
-              <div className="relative mx-auto rounded-[40px] border border-white/40 bg-[#FAFBFF]/90 shadow-[0_32px_60px_rgba(23,48,107,0.22)] p-6">
-                <div
-                  ref={slideWrapperRef}
-                  className="relative mx-auto bg-white rounded-[32px] shadow-[0_20px_48px_rgba(15,23,42,0.18)] overflow-hidden"
-                  style={{
-                    width: SLIDE_WIDTH,
-                    height: SLIDE_HEIGHT,
-                    backgroundImage: showGrid
-                      ? `linear-gradient(rgba(62,109,204,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(62,109,204,0.08) 1px, transparent 1px)`
-                      : undefined,
-                    backgroundSize: showGrid ? `${GRID_SIZE * 2}px ${GRID_SIZE * 2}px` : undefined
-                  }}
+          {showLeftPanel && (
+            <aside className="flex-shrink-0 w-[240px] bg-white/90 border-r border-white/30 backdrop-blur overflow-y-auto space-y-4 p-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide">Slides</h2>
+                <button
+                  type="button"
+                  onClick={addBlankSlide}
+                  className="rounded-full bg-[#3E6DCC] text-white text-xs px-3 py-1.5 font-semibold shadow hover:bg-[#2f5cc4]"
                 >
+                  New
+                </button>
+              </div>
+              <div className="space-y-3">
+                {slides.map((slide, index) => {
+                  const isActive = slide.id === activeSlideId;
+                  return (
+                    <div
+                      key={slide.id}
+                      className={`rounded-2xl border p-3 transition relative ${
+                        isActive ? "border-[#3E6DCC] bg-[#F0F4FF]" : "border-transparent bg-white hover:border-[#C5D4F7]"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setActiveSlideId(slide.id)}
+                        className="w-full text-left"
+                      >
+                        <div className="text-xs uppercase tracking-wide text-[#93A3C3]">Slide {index + 1}</div>
+                        <div className="text-sm font-semibold text-[#1E1E1E] max-h-12 overflow-hidden">
+                          {slide.title || "Untitled"}
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteSlide(slide.id)}
+                        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#6B7280] shadow hover:text-[#EF4444]"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </aside>
+          )}
+
+          <main className="flex-1 flex items-start justify-center min-h-0 overflow-y-auto" onMouseDown={handleCanvasBackgroundClick}>
+            <div className="relative w-full h-full flex items-start justify-center py-6 px-4">
+              <div
+                ref={slideWrapperRef}
+                className={`relative bg-white shadow-[0_4px_20px_rgba(15,23,42,0.1)] overflow-hidden transition-opacity duration-200 ease-in-out ${
+                  isTransitioning ? 'opacity-0' : 'opacity-100'
+                }`}
+                style={{
+                  width: SLIDE_WIDTH,
+                  height: SLIDE_HEIGHT,
+                  backgroundImage: showGrid
+                    ? `linear-gradient(rgba(62,109,204,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(62,109,204,0.08) 1px, transparent 1px)`
+                    : undefined,
+                  backgroundSize: showGrid ? `${GRID_SIZE * 2}px ${GRID_SIZE * 2}px` : undefined
+                }}
+              >
                   <div className="absolute inset-0 bg-white" />
 
                   {activeSlide?.objects.map((obj) => {
@@ -1708,54 +1966,78 @@ export default function Editor() {
                     </div>
                   )}
                 </div>
-              </div>
             </div>
           </main>
 
-          <aside className="w-[280px] rounded-3xl bg-white/85 p-5 shadow-[0_18px_40px_rgba(32,64,128,0.14)] backdrop-blur space-y-5">
-            <section>
-              <h2 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide mb-3">Selection</h2>
-              {selectedObjects.length === 0 ? (
-                <p className="text-sm text-[#6B7280]">Select text or shapes on the canvas to tweak details.</p>
+          {/* Right edge toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowRightPanel((prev) => !prev)}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center gap-1.5 rounded-l-full bg-white/95 hover:bg-white border border-r-0 border-[#3E6DCC]/30 shadow-lg transition-all px-2 py-4 min-h-[80px]"
+            title={showRightPanel ? "Hide sidebar" : "Show sidebar"}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#3E6DCC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {showRightPanel ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
               ) : (
-                <div className="space-y-2 text-sm text-[#1E1E1E]">
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2">Selected: {selectedObjects.length}</div>
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2">Type: {selectedObjects.length === 1 ? selectedObjects[0].type : "Mixed"}</div>
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={duplicateObject}
-                      className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
-                    >
-                      Duplicate
-                    </button>
-                    <button
-                      type="button"
-                      onClick={bringForward}
-                      className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
-                    >
-                      Bring Forward
-                    </button>
-                    <button
-                      type="button"
-                      onClick={sendBackward}
-                      className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
-                    >
-                      Send Backward
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDeleteSelection}
-                      className="rounded-full border border-[#FECACA] bg-[#FFF5F5] px-3 py-1 text-xs font-semibold text-[#B91C1C] hover:bg-[#fee2e2] transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
               )}
-            </section>
+            </svg>
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-[9px] font-semibold text-[#3E6DCC] uppercase tracking-wider leading-tight">
+                {showRightPanel ? "Hide" : "Show"}
+              </span>
+              <span className="text-[9px] font-semibold text-[#3E6DCC] uppercase tracking-wider leading-tight">
+                Sidebar
+              </span>
+            </div>
+          </button>
 
-            <section>
+          {showRightPanel && (
+            <aside className="flex-shrink-0 w-[280px] bg-white/90 border-l border-white/30 backdrop-blur overflow-y-auto space-y-5 p-5">
+              <section>
+                <h2 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide mb-3">Selection</h2>
+                {selectedObjects.length === 0 ? (
+                  <p className="text-sm text-[#6B7280]">Select text or shapes on the canvas to tweak details.</p>
+                ) : (
+                  <div className="space-y-2 text-sm text-[#1E1E1E]">
+                    <div className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2">Selected: {selectedObjects.length}</div>
+                    <div className="rounded-xl border border-[#E2E8F0] bg-white px-3 py-2">Type: {selectedObjects.length === 1 ? selectedObjects[0].type : "Mixed"}</div>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={duplicateObject}
+                        className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
+                      >
+                        Duplicate
+                      </button>
+                      <button
+                        type="button"
+                        onClick={bringForward}
+                        className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
+                      >
+                        Bring Forward
+                      </button>
+                      <button
+                        type="button"
+                        onClick={sendBackward}
+                        className="rounded-full border border-[#CBD5F0] bg-white px-3 py-1 text-xs font-semibold text-[#1E1E1E] hover:bg-[#EEF2FF] transition"
+                      >
+                        Send Backward
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDeleteSelection}
+                        className="rounded-full border border-[#FECACA] bg-[#FFF5F5] px-3 py-1 text-xs font-semibold text-[#B91C1C] hover:bg-[#fee2e2] transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              <section>
               <h3 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide mb-3">Typography</h3>
               <fieldset disabled={!selectedTextObject} className={`${!selectedTextObject ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                 <div className="space-y-4 text-sm text-[#1E1E1E]">
@@ -1867,36 +2149,6 @@ export default function Editor() {
             </section>
 
             <section>
-              <h3 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide mb-3">Templates</h3>
-              <div className="grid gap-3">
-                {slideTemplates.map((template) => (
-                  <button
-                    key={template.id}
-                    type="button"
-                    onClick={() => addSlideFromTemplate(template.id)}
-                    className="w-full rounded-2xl border border-[#D8DEEA] bg-white px-4 py-3 text-left shadow-sm hover:shadow-md transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="h-14 w-20 rounded-xl border border-[#E2E8F8] bg-white shadow-inner"
-                        style={{
-                          background:
-                            template.previewAccent === "#FFFFFF"
-                              ? "linear-gradient(135deg, #FFFFFF 0%, #E6EEFF 100%)"
-                              : `linear-gradient(135deg, ${template.previewAccent} 0%, rgba(230,238,255,0.65) 100%)`
-                        }}
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-[#1E1E1E]">{template.name}</p>
-                        <p className="text-xs text-[#6B7280]">{template.description}</p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section>
               <h3 className="text-sm font-semibold text-[#1E1E1E] uppercase tracking-wide mb-3">AI Suggestions</h3>
               <div className="space-y-2 text-xs text-[#374151]">
                 {aiSuggestions.map((suggestion) => (
@@ -1916,10 +2168,11 @@ export default function Editor() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-dashed border-[#C5D4F7] bg-white/70 px-4 py-3 text-sm text-[#6B7280]">
-              Save a layout into your personal template library. Coming soon—we’ll unlock customizable template sets.
-            </section>
-          </aside>
+              <section className="rounded-2xl border border-dashed border-[#C5D4F7] bg-white/70 px-4 py-3 text-sm text-[#6B7280]">
+                Save a layout into your personal template library. Coming soon—we'll unlock customizable template sets.
+              </section>
+            </aside>
+          )}
         </div>
       </div>
 
