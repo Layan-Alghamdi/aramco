@@ -35,6 +35,7 @@ export default function Projects() {
   const [highlightId, setHighlightId] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [toast, setToast] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [activeFilter, setActiveFilter] = useState(location.state?.filter === "mine" ? "mine" : "all");
 
@@ -73,20 +74,44 @@ export default function Projects() {
   }, [projects]);
 
   const displayedProjects = useMemo(() => {
-    if (activeFilter !== "mine" || !currentUser) {
-      return orderedProjects;
+    let filtered = orderedProjects;
+
+    // Apply "mine" filter if active
+    if (activeFilter === "mine" && currentUser) {
+      filtered = filtered.filter((project) => {
+        if (project.ownerId && project.ownerId === currentUser.id) return true;
+        if (project.ownerEmail && currentUser.email) {
+          return project.ownerEmail.toLowerCase() === currentUser.email.toLowerCase();
+        }
+        if (project.ownerName && currentUser.name) {
+          return project.ownerName.toLowerCase() === currentUser.name.toLowerCase();
+        }
+        return false;
+      });
     }
-    return orderedProjects.filter((project) => {
-      if (project.ownerId && project.ownerId === currentUser.id) return true;
-      if (project.ownerEmail && currentUser.email) {
-        return project.ownerEmail.toLowerCase() === currentUser.email.toLowerCase();
-      }
-      if (project.ownerName && currentUser.name) {
-        return project.ownerName.toLowerCase() === currentUser.name.toLowerCase();
-      }
-      return false;
-    });
-  }, [orderedProjects, activeFilter, currentUser]);
+
+    // Apply search filter (prefix-based, real-time from first character)
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedQuery.length > 0) {
+      const query = trimmedQuery.toLowerCase();
+      filtered = filtered.filter((project) => {
+        const title = (project.name || "").toLowerCase();
+        const description = (project.description || "").toLowerCase();
+        const owner = (
+          project.ownerName || 
+          project.ownerEmail || 
+          project.owner || 
+          ""
+        ).toLowerCase();
+        
+        return title.startsWith(query) || 
+               description.startsWith(query) || 
+               owner.startsWith(query);
+      });
+    }
+
+    return filtered;
+  }, [orderedProjects, activeFilter, currentUser, searchQuery]);
 
   return (
     <div className="projects-page min-h-screen bg-[radial-gradient(circle_at_20%_20%,#00A98E_0%,#2B7AC8_100%)] transition-[background,background-color] duration-500 ease-out">
@@ -120,10 +145,41 @@ export default function Projects() {
           Keep all saved decks at your fingertips. Select any card to continue where you left off.
         </p>
 
+        <div className="mt-6">
+          <div className="relative max-w-md">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by title, description, or owner..."
+              className="w-full rounded-full border border-white/60 bg-white/80 pl-12 pr-4 py-3 text-sm text-[#1E1E1E] placeholder:text-[#6B7280] shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#3E6DCC]/50 focus:bg-white hover:bg-white/90 dark:bg-[#1A1A1A]/80 dark:border-[#3A3A3A] dark:text-white dark:placeholder:text-[#A0B4C0] dark:focus:ring-[#1A73E8]/50 dark:hover:bg-[#1A1A1A]"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6B7280] hover:text-[#1E1E1E] transition-colors dark:text-[#A0B4C0] dark:hover:text-white"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {displayedProjects.length === 0 ? (
             <div className="no-projects col-span-full rounded-2xl border-2 border-dashed border-white/60 bg-white/40 px-6 py-12 text-center text-[#6B7280] transition-colors duration-500 ease-out">
-              No projects yet. Create your first presentation to see it appear here.
+              {searchQuery.trim() || activeFilter === "mine" 
+                ? "No projects match your search or filter. Try adjusting your search terms." 
+                : "No projects yet. Create your first presentation to see it appear here."}
             </div>
           ) : (
             displayedProjects.map((project) => {
