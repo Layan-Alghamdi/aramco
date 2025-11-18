@@ -1186,4 +1186,118 @@ body.new-team-surface {
   box-shadow: 0 14px 26px rgba(62, 109, 204, 0.36), 0 0 30px rgba(0, 140, 255, 0.5) !important;
 }
 
+/* DASHBOARD MAIN CARD DARK MODE */
+.dark .dashboard-main-card,
+:root[data-theme='dark'] .dashboard-main-card {
+  background: linear-gradient(135deg, #0D111C 0%, #0F1623 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* DASHBOARD TYPOGRAPHY DARK MODE */
+.dark .dashboard-heading,
+:root[data-theme='dark'] .dashboard-heading {
+  color: #ffffff !important;
+}
+
+.dark .dashboard-subtitle,
+:root[data-theme='dark'] .dashboard-subtitle {
+  color: #c9d3e1 !important;
+}
+
+.dark .dashboard-text,
+:root[data-theme='dark'] .dashboard-text {
+  color: #c9d3e1 !important;
+}
+
+/* DASHBOARD QUICK CARDS DARK MODE */
+.dark .dashboard-quick-card,
+:root[data-theme='dark'] .dashboard-quick-card {
+  background: #131B2A !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .dashboard-quick-card:hover,
+:root[data-theme='dark'] .dashboard-quick-card:hover {
+  transform: scale(1.03) translateY(-2px) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.dark .dashboard-card-icon-wrapper,
+:root[data-theme='dark'] .dashboard-card-icon-wrapper {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .dashboard-card-text,
+:root[data-theme='dark'] .dashboard-card-text {
+  color: #ffffff !important;
+}
+
+/* DASHBOARD SECTION CARDS (Template Library, Your Teams) DARK MODE */
+.dark .dashboard-section-card,
+:root[data-theme='dark'] .dashboard-section-card {
+  background: #131B2A !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .dashboard-section-heading,
+:root[data-theme='dark'] .dashboard-section-heading {
+  color: #ffffff !important;
+}
+
+.dark .dashboard-section-text,
+:root[data-theme='dark'] .dashboard-section-text {
+  color: #c9d3e1 !important;
+}
+
+/* DASHBOARD TEMPLATE BUTTON DARK MODE */
+.dark .dashboard-template-button,
+:root[data-theme='dark'] .dashboard-template-button {
+  box-shadow: 0 10px 22px rgba(62, 109, 204, 0.28), 0 0 20px rgba(0, 140, 255, 0.4) !important;
+}
+
+.dark .dashboard-template-button:hover,
+:root[data-theme='dark'] .dashboard-template-button:hover {
+  box-shadow: 0 14px 26px rgba(62, 109, 204, 0.36), 0 0 30px rgba(0, 140, 255, 0.5) !important;
+}
+
+/* DASHBOARD TEAMS GRID DARK MODE */
+.dark .dashboard-team-card,
+:root[data-theme='dark'] .dashboard-team-card {
+  background: rgba(19, 27, 42, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .dashboard-team-card:hover,
+:root[data-theme='dark'] .dashboard-team-card:hover {
+  background: rgba(19, 27, 42, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark .dashboard-team-name,
+:root[data-theme='dark'] .dashboard-team-name {
+  color: #ffffff !important;
+}
+
+.dark .dashboard-team-members,
+:root[data-theme='dark'] .dashboard-team-members {
+  color: #c9d3e1 !important;
+}
+
+.dark .dashboard-team-avatar,
+:root[data-theme='dark'] .dashboard-team-avatar {
+  background: rgba(175, 203, 255, 0.15) !important;
+  color: #AFCBFF !important;
+}
+
+.dark .dashboard-teams-empty,
+:root[data-theme='dark'] .dashboard-teams-empty {
+  background: rgba(19, 27, 42, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #c9d3e1 !important;
+}
+
 

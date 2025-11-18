@@ -15,16 +15,22 @@ import useThemeMode from "@/hooks/useThemeMode";
 const iconColor = "#3E6DCC";
 const iconSize = 28;
 
-const icons = {
-  plusCircle: <PlusCircle size={iconSize} color={iconColor} strokeWidth={1.5} />,
-  folder: <Folder size={iconSize} color={iconColor} strokeWidth={1.5} />,
-  userPlus: <UserPlus size={iconSize} color={iconColor} strokeWidth={1.5} />
+const getIcons = (isDark) => {
+  const color = isDark ? "#AFCBFF" : iconColor;
+  return {
+    plusCircle: <PlusCircle size={iconSize} color={color} strokeWidth={1.5} />,
+    folder: <Folder size={iconSize} color={color} strokeWidth={1.5} />,
+    userPlus: <UserPlus size={iconSize} color={color} strokeWidth={1.5} />
+  };
 };
 
-const quickCards = [
-  { title: "Create", path: "/create", icon: icons.plusCircle },
-  { title: "Projects", path: "/projects", icon: icons.folder }
-];
+const getQuickCards = (isDark) => {
+  const icons = getIcons(isDark);
+  return [
+    { title: "Create", path: "/create", icon: icons.plusCircle },
+    { title: "Projects", path: "/projects", icon: icons.folder }
+  ];
+};
 
 const missingRoutes = new Set(["/projects"]);
 
@@ -162,14 +168,14 @@ export default function Dashboard() {
     <>
       <SharedHeader variant="dashboard" />
       <section className="min-h-[88vh] w-full flex justify-center items-center px-6 py-10">
-        <div className="relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08)] px-10 py-12">
+        <div className="dashboard-main-card relative w-full max-w-[1200px] rounded-[24px] bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08)] px-10 py-12">
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Welcome back</p>
-                  <h2 className="text-2xl font-semibold text-[#0F172A]">{user?.name ? `${user.name}` : "Design Studio Member"}</h2>
-                  <p className="text-sm text-[#4B5563]">{user?.role ?? "Collaborator"} • {user?.department ?? "Aramco Digital"}</p>
+                  <p className="dashboard-subtitle text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Welcome back</p>
+                  <h2 className="dashboard-heading text-2xl font-semibold text-[#0F172A]">{user?.name ? `${user.name}` : "Design Studio Member"}</h2>
+                  <p className="dashboard-text text-sm text-[#4B5563]">{user?.role ?? "Collaborator"} • {user?.department ?? "Aramco Digital"}</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -185,43 +191,43 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 lg:gap-8 xl:gap-10">
-              {quickCards.map((card) => (
+              {getQuickCards(isDarkMode).map((card) => (
                 <button
                   key={card.title}
                   type="button"
                   onClick={() => handleCardClick(card.path)}
-                  className="w-[220px] h-[180px] sm:w-[220px] sm:h-[190px] lg:w-[240px] lg:h-[190px] xl:w-[260px] xl:h-[200px] rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] flex flex-col items-center justify-center gap-4 text-[#4B5563] shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
+                  className="dashboard-quick-card w-[220px] h-[180px] sm:w-[220px] sm:h-[190px] lg:w-[240px] lg:h-[190px] xl:w-[260px] xl:h-[200px] rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] flex flex-col items-center justify-center gap-4 text-[#4B5563] shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
                 >
-                  <div className="w-[52px] h-[52px] rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
+                  <div className="dashboard-card-icon-wrapper w-[52px] h-[52px] rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
                     {card.icon}
                   </div>
-                  <span className="text-lg font-semibold">{card.title}</span>
+                  <span className="dashboard-card-text text-lg font-semibold">{card.title}</span>
                 </button>
               ))}
               <button
                 type="button"
                 onClick={() => navigate("/teams/new")}
-                className="w-[220px] h-[180px] sm:w-[220px] sm:h-[190px] lg:w-[240px] lg:h-[190px] xl:w-[260px] xl:h-[200px] rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] flex flex-col items-center justify-center gap-4 text-[#4B5563] shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
+                className="dashboard-quick-card w-[220px] h-[180px] sm:w-[220px] sm:h-[190px] lg:w-[240px] lg:h-[190px] xl:w-[260px] xl:h-[200px] rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] flex flex-col items-center justify-center gap-4 text-[#4B5563] shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
               >
-                <div className="w-[52px] h-[52px] rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
-                  {icons.userPlus}
+                <div className="dashboard-card-icon-wrapper w-[52px] h-[52px] rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
+                  {getIcons(isDarkMode).userPlus}
                 </div>
-                <span className="text-lg font-semibold">New team</span>
+                <span className="dashboard-card-text text-lg font-semibold">New team</span>
               </button>
             </div>
 
-            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
+            <div className="dashboard-section-card rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-[#1B1533] mb-2">Template library</h2>
-                  <p className="text-sm text-[#6B7280]">
+                  <h2 className="dashboard-section-heading text-lg font-semibold text-[#1B1533] mb-2">Template library</h2>
+                  <p className="dashboard-section-text text-sm text-[#6B7280]">
                     Choose a branded template to jump-start your design. Slides are fully editable once you launch the studio.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setTemplateLibraryModalOpen(true)}
-                  className="inline-flex items-center rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
+                  className="dashboard-template-button inline-flex items-center rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
                 >
                   Start from template
                 </button>
@@ -258,15 +264,15 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
+            <div className="dashboard-section-card rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-6 shadow-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F3F4F6] border border-[#E5E7EB]">
                     <span className="text-sm font-semibold text-[#4B5563]">👥</span>
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-[#1B1533]">Your teams</h2>
-                    <p className="text-sm text-[#6B7280]">Quickly access the teams you manage.</p>
+                    <h2 className="dashboard-section-heading text-lg font-semibold text-[#1B1533]">Your teams</h2>
+                    <p className="dashboard-section-text text-sm text-[#6B7280]">Quickly access the teams you manage.</p>
                   </div>
                 </div>
                 <button
