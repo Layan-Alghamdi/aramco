@@ -182,10 +182,10 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => navigate("/profile")}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#1F2937]/10 px-4 py-2 text-xs font-semibold text-[#1F2937] hover:bg-[#1F2937]/15 transition"
+                  className="dashboard-profile-button inline-flex items-center gap-2 rounded-full bg-[#1F2937]/10 px-4 py-2 text-xs font-semibold text-[#1F2937] hover:bg-[#1F2937]/15 transition"
                 >
                   Profile
-                  <span aria-hidden="true">›</span>
+                  <span className="dashboard-profile-arrow" aria-hidden="true">›</span>
                 </button>
               </div>
             </div>

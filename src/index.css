@@ -1300,4 +1300,30 @@ body.new-team-surface {
   color: #c9d3e1 !important;
 }
 
+/* DASHBOARD PROFILE BUTTON DARK MODE */
+.dark .dashboard-profile-button,
+:root[data-theme='dark'] .dashboard-profile-button {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
+  color: #E4ECF8 !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .dashboard-profile-button:hover,
+:root[data-theme='dark'] .dashboard-profile-button:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 12px rgba(73, 143, 255, 0.35) !important;
+}
+
+.dark .dashboard-profile-arrow,
+:root[data-theme='dark'] .dashboard-profile-arrow {
+  color: #7FB0FF !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
 
