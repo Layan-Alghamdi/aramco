@@ -229,10 +229,10 @@ export default function Dashboard() {
             </div>
 
             {/* Quick Tools Section */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-4 shadow-md dark:bg-[#0d1628] dark:border-[#1F2937]">
+            <div className="quick-tools-card rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] px-6 py-4 shadow-md">
               <div className="text-center mb-3">
-                <h2 className="text-lg font-semibold text-[#1B1533] mb-1 dark:text-[#E2E8F0]">Quick Tools</h2>
-                <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF]">
+                <h2 className="quick-tools-heading text-lg font-semibold text-[#1B1533] mb-1">Quick Tools</h2>
+                <p className="quick-tools-description text-xs text-[#6B7280]">
                   Access your essential work tools quickly — stay connected and collaborate faster.
                 </p>
               </div>
@@ -241,7 +241,7 @@ export default function Dashboard() {
                   href="https://outlook.office.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
+                  className="quick-tool-button inline-flex items-center gap-2 rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
                 >
                   <Mail size={18} color="white" />
                   Outlook
@@ -250,7 +250,7 @@ export default function Dashboard() {
                   href="https://teams.microsoft.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
+                  className="quick-tool-button inline-flex items-center gap-2 rounded-full bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(62,109,204,0.28)] hover:shadow-[0_14px_26px_rgba(62,109,204,0.36)] transition"
                 >
                   <Users size={18} color="white" />
                   Microsoft Teams

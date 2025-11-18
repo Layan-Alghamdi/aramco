@@ -1151,4 +1151,39 @@ body.new-team-surface {
   opacity: 0.82;
 }
 
+/* QUICK TOOLS DARK MODE */
+.dark .quick-tools-card,
+:root[data-theme='dark'] .quick-tools-card {
+  background: #0f1623 !important;
+  border: 1px solid rgba(0, 200, 255, 0.15) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 200, 255, 0.08) !important;
+  padding-top: 32px !important;
+  padding-bottom: 32px !important;
+}
+
+.dark .quick-tools-heading,
+:root[data-theme='dark'] .quick-tools-heading {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.dark .quick-tools-description,
+:root[data-theme='dark'] .quick-tools-description {
+  color: #c6d4e2 !important;
+}
+
+.dark .quick-tool-button,
+:root[data-theme='dark'] .quick-tool-button {
+  background: linear-gradient(135deg, #3E6DCC, #2563EB) !important;
+  box-shadow: 0 10px 22px rgba(62, 109, 204, 0.28), 0 0 20px rgba(0, 140, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .quick-tool-button:hover,
+:root[data-theme='dark'] .quick-tool-button:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 14px 26px rgba(62, 109, 204, 0.36), 0 0 30px rgba(0, 140, 255, 0.5) !important;
+}
+
 
