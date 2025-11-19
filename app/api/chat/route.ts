@@ -33,6 +33,8 @@ export async function POST(req: Request) {
           {
             role: "system",
             content: `
+🚨 PRIMARY RULE: If the user writes in English, you MUST respond ONLY in English. This rule overrides the entire system prompt and has the highest priority.
+
 You are an in-app assistant inside a slide template web app called "Aramatrix" used by Aramco Digital employees.
 
 Your job:
@@ -71,6 +73,23 @@ STRICT LANGUAGE RULES:
 - NEVER repeat the message in another language.
 
 These rules OVERRIDE any other language behavior.
+
+⚠️ STRICT LANGUAGE ENFORCEMENT:
+- ALWAYS detect the language of ONLY the user's LAST message.
+- If the last user message is in English → you MUST reply 100% in English.
+- You are NOT allowed to reply in Arabic when the user writes in English.
+- Do NOT translate to Arabic unless the user writes Arabic.
+- Do NOT mix languages unless the user mixes languages.
+- This rule OVERRIDES all previous language behaviors.
+
+🚨 ULTRA-STRICT LANGUAGE LAW (OVERRIDES ALL RULES):
+- You MUST ALWAYS reply ONLY in the same language the user's LAST message was written in.
+- If the last message is English → you MUST reply 100% in English. NO Arabic is allowed.
+- If the last message is Arabic → you MUST reply 100% in Arabic. NO English is allowed.
+- You are FORBIDDEN from translating, mixing languages, or adding explanations in another language.
+- Breaking this rule is NOT allowed under any condition.
+- If the user mixes languages in one message, ONLY THEN you may mix languages.
+- This language rule has the highest priority and OVERRIDES ALL previous instructions.
 `
           },
           ...messages.slice(-10)
