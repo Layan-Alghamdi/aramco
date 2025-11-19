@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { setThemePreference } from "@/lib/theme";
+import { useProjects } from "@/context/ProjectsContext";
+import { cloneTemplateSlides, slideTemplates } from "@/data/templates";
+import { recordProjectForUser } from "@/lib/usersStore";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const ChatAssistant = () => {
+  const navigate = useNavigate();
+  const { addProject } = useProjects();
+  const user = useCurrentUser();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -27,15 +36,30 @@ const ChatAssistant = () => {
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
+    const messageText = inputValue.trim();
     const userMessage = {
       role: "user",
-      content: inputValue.trim()
+      content: messageText
     };
 
     // Add user message immediately
     setMessages((prev) => [...prev, userMessage]);
     const updatedMessages = [...messages, userMessage];
     setInputValue("");
+
+    // Check if this is a command (navigation or theme)
+    const commandResult = handleAssistantCommand(messageText);
+    if (commandResult.handled) {
+      // Command was handled - show response and don't call API
+      const assistantMessage = {
+        role: "assistant",
+        content: commandResult.response
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      return;
+    }
+
+    // Not a command - proceed with normal AI chat
     setIsLoading(true);
 
     try {
@@ -193,6 +217,142 @@ const ChatAssistant = () => {
       }
     };
   }, []);
+
+  // Helper function to detect language and return appropriate response
+  const getCommandResponse = (isArabic) => {
+    return {
+      projects: isArabic ? "تم، فتحت لك صفحة المشاريع ✨" : "Done! Opened Projects page ✨",
+      create: isArabic ? "تم، أنشأت مشروع جديد ✨" : "Done! Created a new project ✨",
+      newTeam: isArabic ? "تم، فتحت صفحة إنشاء تيم جديد ✨" : "Done! Opened New Team page ✨",
+      templateLibrary: isArabic ? "تم، فتحت مكتبة القوالب ✨" : "Done! Opened Template Library ✨",
+      aramatrixAI: isArabic ? "تم، فتحت Aramatrix AI ✨" : "Done! Opened Aramatrix AI ✨",
+      darkMode: isArabic ? "تم، غيرت الوضع إلى الدارك مود ✨" : "Done! Switched to dark mode ✨",
+      lightMode: isArabic ? "تم، غيرت الوضع إلى اللايت مود ✨" : "Done! Switched to light mode ✨"
+    };
+  };
+
+  // Detect if message is in Arabic
+  const isArabicMessage = (text) => {
+    const arabicPattern = /[\u0600-\u06FF]/;
+    return arabicPattern.test(text);
+  };
+
+  // Handle assistant commands (navigation and theme)
+  const handleAssistantCommand = (rawMessage) => {
+    const msg = rawMessage.toLowerCase().trim();
+    const isArabic = isArabicMessage(rawMessage);
+    const responses = getCommandResponse(isArabic);
+
+    // Projects page
+    if (
+      msg.includes("المشاريع") ||
+      msg.includes("projects") ||
+      msg.includes("project page") ||
+      msg.includes("open projects")
+    ) {
+      navigate("/projects");
+      return { handled: true, response: responses.projects };
+    }
+
+    // Create page / new project
+    if (
+      msg.includes("مشروع جديد") ||
+      msg.includes("ابغى اسوي مشروع") ||
+      msg.includes("create project") ||
+      msg.includes("open create") ||
+      msg.includes("new project") ||
+      msg.includes("create")
+    ) {
+      try {
+        const defaultTemplate = slideTemplates[0];
+        const slides = cloneTemplateSlides(defaultTemplate.id);
+        const project = addProject({
+          name: "Untitled project",
+          description: "",
+          templateId: defaultTemplate.id,
+          slides,
+          status: "Draft",
+          ownerId: user?.id ?? null,
+          ownerName: user?.name ?? "You",
+          ownerEmail: user?.email ?? "",
+          ownerRole: user?.role ?? ""
+        });
+
+        if (user?.id) {
+          recordProjectForUser(user.id, project.id);
+        }
+
+        navigate(`/editor/${project.id}`, { state: { from: "create", highlightProjectId: project.id } });
+        return { handled: true, response: responses.create };
+      } catch (error) {
+        console.error("Failed to create project", error);
+        return { handled: true, response: isArabic ? "حدث خطأ في إنشاء المشروع" : "Failed to create project" };
+      }
+    }
+
+    // New team
+    if (
+      msg.includes("تيم جديد") ||
+      msg.includes("انشئ تيم") ||
+      msg.includes("create team") ||
+      msg.includes("new team")
+    ) {
+      navigate("/teams/new");
+      return { handled: true, response: responses.newTeam };
+    }
+
+    // Template library / Start from template
+    if (
+      msg.includes("تمبلت") ||
+      msg.includes("template library") ||
+      msg.includes("start from template") ||
+      msg.includes("templates") ||
+      msg.includes("القوالب")
+    ) {
+      // Navigate to dashboard - user can click the template library button
+      // For better UX, we could use localStorage to signal opening the modal
+      navigate("/dashboard", { state: { openTemplateLibrary: true } });
+      return { handled: true, response: responses.templateLibrary };
+    }
+
+    // Aramatrix AI tile
+    if (
+      msg.includes("aramatrix ai") ||
+      msg.includes("ارامتركس اي") ||
+      msg.includes("ارامتركس ai") ||
+      msg.includes("aramatrix")
+    ) {
+      navigate("/aramatrix-ai");
+      return { handled: true, response: responses.aramatrixAI };
+    }
+
+    // Theme toggle - Dark mode
+    if (
+      msg.includes("دارك مود") ||
+      msg.includes("dark mode") ||
+      msg.includes("dark mood") ||
+      msg.includes("night mode") ||
+      msg.includes("الوضع الداكن") ||
+      msg.includes("خله غامق")
+    ) {
+      setThemePreference("dark");
+      return { handled: true, response: responses.darkMode };
+    }
+
+    // Theme toggle - Light mode
+    if (
+      msg.includes("لايت مود") ||
+      msg.includes("light mode") ||
+      msg.includes("mode light") ||
+      msg.includes("الوضع الفاتح") ||
+      msg.includes("day mode")
+    ) {
+      setThemePreference("light");
+      return { handled: true, response: responses.lightMode };
+    }
+
+    return { handled: false };
+  };
 
   return (
     <>
