@@ -77,6 +77,10 @@ export default function Dashboard() {
       setTimeout(() => setToast(""), 2200);
       navigate(location.pathname, { replace: true });
     }
+    if (location.state?.openTemplateLibrary) {
+      setTemplateLibraryModalOpen(true);
+      navigate(location.pathname, { replace: true });
+    }
   }, [location.pathname, location.state, navigate]);
 
   const handleCreateProject = useCallback(async () => {
