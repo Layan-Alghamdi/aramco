@@ -5,8 +5,10 @@ const ChatAssistant = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,6 +122,77 @@ const ChatAssistant = () => {
       sendMessage();
     }
   };
+
+  const startListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice input is not supported on this browser.");
+      return;
+    }
+
+    // Initialize recognition if not already done
+    if (!recognitionRef.current) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "ar-SA"; // Start with Arabic, browser will auto-detect English if spoken
+    }
+
+    // Always set up handlers to ensure they're current
+    recognitionRef.current.onresult = (event) => {
+      console.log("Speech recognition result event:", event);
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      console.log("Transcribed text:", transcript);
+      if (transcript && transcript.trim()) {
+        setInputValue((prev) => {
+          const newValue = prev + (prev ? " " : "") + transcript.trim();
+          console.log("Setting input value to:", newValue);
+          return newValue;
+        });
+      }
+      setIsListening(false);
+    };
+
+    recognitionRef.current.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+      if (event.error === "no-speech") {
+        // User stopped speaking, this is normal
+      } else {
+        alert("Speech recognition error. Please try again.");
+      }
+    };
+
+    recognitionRef.current.onend = () => {
+      setIsListening(false);
+    };
+
+    try {
+      recognitionRef.current.start();
+      setIsListening(true);
+    } catch (error) {
+      console.error("Error starting speech recognition:", error);
+      setIsListening(false);
+      alert("Could not start voice input. Please try again.");
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -249,7 +322,7 @@ const ChatAssistant = () => {
 
           {/* Input */}
           <div className="border-t border-[#E5E7EB] p-4">
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
                 type="text"
@@ -257,13 +330,50 @@ const ChatAssistant = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
-                disabled={isLoading}
+                disabled={isLoading || isListening}
                 className="flex-1 rounded-xl border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm text-[#1E1E1E] placeholder:text-[#9CA3AF] focus:border-[#3E6DCC] focus:outline-none focus:ring-2 focus:ring-[#3E6DCC]/20 disabled:bg-gray-50 disabled:cursor-not-allowed"
               />
               <button
+                onClick={isListening ? stopListening : startListening}
+                disabled={isLoading}
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition ${
+                  isListening
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                } disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300`}
+                aria-label={isListening ? "Stop recording" : "Start voice input"}
+              >
+                {isListening ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6 6h12v12H6z" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                    />
+                  </svg>
+                )}
+              </button>
+              <button
                 onClick={sendMessage}
-                disabled={!inputValue.trim() || isLoading}
-                className="rounded-xl bg-[#3E6DCC] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2853b2] transition disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+                disabled={!inputValue.trim() || isLoading || isListening}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-[#3E6DCC] text-white hover:bg-[#2853b2] transition disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+                aria-label="Send message"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
