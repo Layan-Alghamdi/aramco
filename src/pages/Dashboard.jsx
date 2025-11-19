@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PlusCircle, Folder, UserPlus, Mail, Users } from "lucide-react";
+import { PlusCircle, Folder, UserPlus, Mail, Users, Sparkles } from "lucide-react";
 import SharedHeader from "@/components/SharedHeader";
 import Toast from "@/components/Toast";
 import TeamsGrid from "@/components/TeamsGrid";
@@ -17,10 +17,12 @@ const iconSize = 28;
 
 const getIcons = (isDark) => {
   const color = isDark ? "#AFCBFF" : iconColor;
+  const aiColor = isDark ? "#00FFFF" : "#3A7BFF";
   return {
     plusCircle: <PlusCircle size={iconSize} color={color} strokeWidth={1.5} />,
     folder: <Folder size={iconSize} color={color} strokeWidth={1.5} />,
-    userPlus: <UserPlus size={iconSize} color={color} strokeWidth={1.5} />
+    userPlus: <UserPlus size={iconSize} color={color} strokeWidth={1.5} />,
+    sparkles: <Sparkles size={iconSize} color={aiColor} strokeWidth={1.5} />
   };
 };
 
@@ -191,7 +193,8 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 lg:gap-8 xl:gap-10">
-              {getQuickCards(isDarkMode).map((card) => (
+              {/* Create Card */}
+              {getQuickCards(isDarkMode).filter(card => card.title === "Create").map((card) => (
                 <button
                   key={card.title}
                   type="button"
@@ -204,6 +207,40 @@ export default function Dashboard() {
                   <span className="dashboard-card-text text-lg font-semibold">{card.title}</span>
                 </button>
               ))}
+              
+              {/* Aramatrix AI Card */}
+              <button
+                type="button"
+                onClick={() => navigate("/aramatrix-ai")}
+                className="aramatrix-ai-card dashboard-quick-card w-[220px] h-[180px] sm:w-[220px] sm:h-[190px] lg:w-[240px] lg:h-[190px] xl:w-[260px] xl:h-[200px] rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] flex flex-col items-center justify-center gap-4 text-[#4B5563] shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer relative group"
+              >
+                <div className="aramatrix-ai-icon-wrapper dashboard-card-icon-wrapper w-[52px] h-[52px] rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
+                  {getIcons(isDarkMode).sparkles}
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <span className="aramatrix-ai-title dashboard-card-text text-lg font-semibold">Aramatrix AI</span>
+                  <span className="aramatrix-ai-subtitle text-xs text-[#6B7280] opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center px-2">
+                    Create smart slides instantly with AI
+                  </span>
+                </div>
+              </button>
+
+              {/* Projects Card */}
+              {getQuickCards(isDarkMode).filter(card => card.title === "Projects").map((card) => (
+                <button
+                  key={card.title}
+                  type="button"
+                  onClick={() => handleCardClick(card.path)}
+                  className="dashboard-quick-card w-[220px] h-[180px] sm:w-[220px] sm:h-[190px] lg:w-[240px] lg:h-[190px] xl:w-[260px] xl:h-[200px] rounded-2xl border border-[#E5E7EB] bg-[#FAFBFF] flex flex-col items-center justify-center gap-4 text-[#4B5563] shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-pointer"
+                >
+                  <div className="dashboard-card-icon-wrapper w-[52px] h-[52px] rounded-full bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center">
+                    {card.icon}
+                  </div>
+                  <span className="dashboard-card-text text-lg font-semibold">{card.title}</span>
+                </button>
+              ))}
+              
+              {/* New Team Card */}
               <button
                 type="button"
                 onClick={() => navigate("/teams/new")}

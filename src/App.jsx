@@ -17,6 +17,7 @@ import EditTeam from "./pages/EditTeam";
 import ChangePassword from "./pages/ChangePassword";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import ThemePreferences from "./pages/ThemePreferences";
+import AramatrixAI from "./pages/AramatrixAI";
 import ChatAssistant from "./components/ChatAssistant";
 import {
   applyTheme,
@@ -124,6 +125,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <CreateProject />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/aramatrix-ai"
+        element={
+          <ProtectedRoute>
+            <AramatrixAI />
           </ProtectedRoute>
         }
       />

@@ -1410,4 +1410,87 @@ body.new-team-surface {
   opacity: 1 !important;
 }
 
+/* ARAMATRIX AI CARD - LIGHT MODE */
+.aramatrix-ai-card {
+  background: #F8FAFF !important;
+  border: 1px solid rgba(58, 123, 255, 0.2) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08), 0 0 20px rgba(58, 123, 255, 0.15) !important;
+  position: relative;
+  overflow: visible;
+}
+
+.aramatrix-ai-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(58, 123, 255, 0.3), rgba(76, 212, 169, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.aramatrix-ai-card:hover::before {
+  opacity: 1;
+}
+
+.aramatrix-ai-card:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 30px rgba(58, 123, 255, 0.25) !important;
+}
+
+.aramatrix-ai-icon-wrapper {
+  background: linear-gradient(135deg, rgba(58, 123, 255, 0.1), rgba(76, 212, 169, 0.1)) !important;
+  border: 1px solid rgba(58, 123, 255, 0.2) !important;
+}
+
+.aramatrix-ai-title {
+  background: linear-gradient(135deg, #3A7BFF, #4CD4A9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ARAMATRIX AI CARD - DARK MODE */
+.dark .aramatrix-ai-card,
+:root[data-theme='dark'] .aramatrix-ai-card {
+  background: #0F172A !important;
+  border: 1px solid rgba(0, 255, 255, 0.2) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 255, 255, 0.2), 0 0 40px rgba(26, 115, 232, 0.15) !important;
+}
+
+.dark .aramatrix-ai-card::before,
+:root[data-theme='dark'] .aramatrix-ai-card::before {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(26, 115, 232, 0.4));
+}
+
+.dark .aramatrix-ai-card:hover,
+:root[data-theme='dark'] .aramatrix-ai-card:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 35px rgba(0, 255, 255, 0.35), 0 0 50px rgba(26, 115, 232, 0.25) !important;
+}
+
+.dark .aramatrix-ai-icon-wrapper,
+:root[data-theme='dark'] .aramatrix-ai-icon-wrapper {
+  background: rgba(0, 255, 255, 0.1) !important;
+  border: 1px solid rgba(0, 255, 255, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
+}
+
+.dark .aramatrix-ai-title,
+:root[data-theme='dark'] .aramatrix-ai-title {
+  color: #F1F5FF !important;
+  -webkit-text-fill-color: #F1F5FF !important;
+  background: none !important;
+}
+
+.dark .aramatrix-ai-subtitle,
+:root[data-theme='dark'] .aramatrix-ai-subtitle {
+  color: #C7D2DE !important;
+}
+
 
