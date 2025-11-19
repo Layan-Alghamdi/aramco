@@ -185,6 +185,20 @@ function UserMenu({ tone = "default" }) {
                 <span>›</span>
               </button>
             </li>
+            <li>
+              <button
+                type="button"
+                onClick={handleNavigate("/team-activity")}
+                className={
+                  isNotificationsDark
+                    ? "notifications-menu-item flex w-full items-center justify-between rounded-lg px-3 py-2"
+                    : "flex w-full items-center justify-between rounded-lg px-3 py-2 hover:bg-[#EEF2FF]"
+                }
+              >
+                Team Activity Overview
+                <span>›</span>
+              </button>
+            </li>
           </ul>
           <button
             type="button"
@@ -216,7 +230,8 @@ export default function SharedHeader({ variant = "default" }) {
   const isDashboardRoute = location.pathname === "/dashboard";
   const isNewTeamRoute = location.pathname === "/teams/new";
   const isProjectsRoute = location.pathname === "/projects";
-  const isScopedDark = (isNotificationsRoute || isFeaturesRoute || isProfileRoute || isHomeRoute || isAboutRoute || isDashboardRoute || isNewTeamRoute || isProjectsRoute) && themeMode === "dark";
+  const isTeamActivityRoute = location.pathname === "/team-activity";
+  const isScopedDark = (isNotificationsRoute || isFeaturesRoute || isProfileRoute || isHomeRoute || isAboutRoute || isDashboardRoute || isNewTeamRoute || isProjectsRoute || isTeamActivityRoute) && themeMode === "dark";
   const wrapperClasses = `${isDashboard ? "mb-6" : "mb-8 md:mb-10"}`;
   const barClasses = [
     "w-full transition-all duration-200",

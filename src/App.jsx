@@ -18,6 +18,7 @@ import ChangePassword from "./pages/ChangePassword";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import ThemePreferences from "./pages/ThemePreferences";
 import AramatrixAI from "./pages/AramatrixAI";
+import TeamActivityDashboard from "./pages/TeamActivityDashboard";
 import ChatAssistant from "./components/ChatAssistant";
 import {
   applyTheme,
@@ -141,6 +142,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Projects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/team-activity"
+        element={
+          <ProtectedRoute>
+            <TeamActivityDashboard />
           </ProtectedRoute>
         }
       />

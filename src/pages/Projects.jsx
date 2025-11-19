@@ -27,6 +27,156 @@ const formatDisplayDate = (isoString) => {
   }
 };
 
+// Activity Preview Card Component
+const ActivityPreviewCard = ({ projects, currentUser, isDarkMode, navigate }) => {
+  const stats = useMemo(() => {
+    // Most active user
+    const userActivity = new Map();
+    projects.forEach((project) => {
+      const userKey = project.ownerEmail || project.ownerName || "Unknown";
+      const current = userActivity.get(userKey) || { name: project.ownerName || "Unknown", count: 0 };
+      current.count += 1;
+      userActivity.set(userKey, current);
+    });
+    const mostActiveUser = Array.from(userActivity.values())
+      .sort((a, b) => b.count - a.count)[0] || { name: "N/A", count: 0 };
+    
+    // Most edited project
+    const mostEditedProject = [...projects]
+      .sort((a, b) => {
+        const aDate = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const bDate = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return bDate - aDate;
+      })[0] || { name: "N/A" };
+    
+    // Today's activity count
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayActivityCount = projects.filter(p => {
+      const updated = new Date(p.updatedAt || p.createdAt || 0);
+      updated.setHours(0, 0, 0, 0);
+      return updated.getTime() === today.getTime();
+    }).length;
+    
+    return { mostActiveUser, mostEditedProject, todayActivityCount };
+  }, [projects]);
+  
+  // Generate thin horizontal activity strip (last 7 days)
+  const activityStrip = useMemo(() => {
+    const data = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      const count = projects.filter(p => {
+        const updated = new Date(p.updatedAt || p.createdAt || 0).toISOString().split('T')[0];
+        return updated === dateKey;
+      }).length;
+      data.push({ date: dateKey, count });
+    }
+    return data;
+  }, [projects]);
+  
+  const maxCount = Math.max(...activityStrip.map(d => d.count), 1);
+  
+  const getColor = (count) => {
+    if (count === 0) return isDarkMode ? "#1A1A1A" : "#EBEDF0";
+    const intensity = count / maxCount;
+    if (intensity < 0.33) return isDarkMode ? "#0D4A3C" : "#C6E48B";
+    if (intensity < 0.66) return isDarkMode ? "#0F6B5A" : "#7BC96F";
+    return isDarkMode ? "#128B76" : "#239A3B";
+  };
+  
+  return (
+    <div
+      className="group cursor-pointer rounded-2xl border border-white/60 bg-white/85 p-5 shadow-[0_6px_18px_rgba(0,0,0,0.08)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(62,109,204,0.2)] dark:bg-[#1A1A1A]/80 dark:border-[#3A3A3A] dark:hover:shadow-[0_12px_24px_rgba(26,115,232,0.25)]"
+      onClick={() => navigate("/team-activity")}
+    >
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex-1">
+          <h3 className={`text-base font-semibold mb-1 ${isDarkMode ? "text-white" : "text-[#1E1E1E]"}`}>
+            Team Activity Overview
+          </h3>
+          <p className={`text-xs ${isDarkMode ? "text-[#A0B4C0]" : "text-[#6B7280]"}`}>
+            Quick overview of today's team performance.
+          </p>
+        </div>
+      </div>
+      
+      {/* Thin Horizontal Activity Strip */}
+      <div className="mb-4">
+        <div className="flex gap-0.5 h-2 rounded-full overflow-hidden">
+          {activityStrip.map((day, idx) => (
+            <div
+              key={idx}
+              className="flex-1 rounded-sm"
+              style={{ backgroundColor: getColor(day.count) }}
+              title={`${day.date}: ${day.count} activities`}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Quick Stats */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div>
+          <p className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-[#A0B4C0]" : "text-[#6B7280]"}`}>
+            Most Active User
+          </p>
+          <p className={`text-sm font-semibold truncate ${isDarkMode ? "text-white" : "text-[#1E1E1E]"}`} title={stats.mostActiveUser.name}>
+            {stats.mostActiveUser.name}
+          </p>
+        </div>
+        <div>
+          <p className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-[#A0B4C0]" : "text-[#6B7280]"}`}>
+            Most Edited Project
+          </p>
+          <p className={`text-sm font-semibold truncate ${isDarkMode ? "text-white" : "text-[#1E1E1E]"}`} title={stats.mostEditedProject.name}>
+            {stats.mostEditedProject.name}
+          </p>
+        </div>
+        <div>
+          <p className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-[#A0B4C0]" : "text-[#6B7280]"}`}>
+            Recent Activity
+          </p>
+          <p className={`text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#1E1E1E]"}`}>
+            {stats.todayActivityCount} edits today
+          </p>
+        </div>
+      </div>
+      
+      {/* View Full Dashboard Link */}
+      <div className="flex items-center justify-end pt-2 border-t border-white/40 dark:border-[#3A3A3A]">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate("/team-activity");
+          }}
+          className={`text-xs font-medium flex items-center gap-1 transition-colors ${
+            isDarkMode 
+              ? "text-[#A0B4C0] hover:text-white" 
+              : "text-[#6B7280] hover:text-[#3E6DCC]"
+          }`}
+        >
+          View full dashboard
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-3 w-3 transition-transform group-hover:translate-x-0.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15.75 15.75 8.25M9 8.25h6.75V15" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export default function Projects() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -186,6 +336,11 @@ export default function Projects() {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Team Activity Preview Card */}
+        <div className="mt-6">
+          <ActivityPreviewCard projects={projects} currentUser={currentUser} isDarkMode={isDarkMode} navigate={navigate} />
         </div>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
