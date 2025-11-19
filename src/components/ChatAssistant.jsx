@@ -32,36 +32,81 @@ const ChatAssistant = () => {
 
     // Add user message immediately
     setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
     setInputValue("");
     setIsLoading(true);
 
     try {
+      const requestBody = {
+        messages: updatedMessages
+      };
+      
+      console.log("FRONTEND: Sending to /api/chat", requestBody);
+      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          messages: [...messages, userMessage]
-        })
+        body: JSON.stringify(requestBody)
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to get response");
+      console.log("FRONTEND: Response status:", response.status, response.statusText);
+      console.log("FRONTEND: Response headers:", Object.fromEntries(response.headers.entries()));
+
+      // Try to parse response body for both success and error cases
+      let data;
+      try {
+        const text = await response.text();
+        console.log("FRONTEND: Response text:", text);
+        data = text ? JSON.parse(text) : {};
+      } catch (parseError) {
+        console.error("FRONTEND: Failed to parse response as JSON:", parseError);
+        throw new Error(`Invalid response from server: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      // Handle error responses (non-200 status codes)
+      if (!response.ok) {
+        console.error("FRONTEND: Response error - status not OK:", {
+          status: response.status,
+          statusText: response.statusText,
+          data: data
+        });
+        // Use error message from response if available
+        const errorMessage = data.message || data.reply || data.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      // Handle successful responses
+      console.log("FRONTEND: Response data (success):", data);
+      
+      // Read reply from data.reply (matching backend response format)
+      const replyText = data.reply;
+      
+      if (!replyText || typeof replyText !== 'string' || replyText.trim() === "") {
+        console.warn("FRONTEND: Empty or invalid reply received:", replyText);
+        throw new Error("Received empty response from assistant");
+      }
+      
       const assistantMessage = {
         role: "assistant",
-        content: data.message || "I'm here to help!"
+        content: replyText
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Chat error:", error);
+      // Detailed error logging - DO NOT swallow errors silently
+      console.error("FRONTEND: CHAT ERROR", {
+        error: error,
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      // Show user-friendly error message in UI
       const errorMessage = {
         role: "assistant",
-        content: "Something went wrong. Please try again."
+        content: error.message || "Something went wrong. Please try again."
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {

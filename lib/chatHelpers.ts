@@ -1,4 +1,20 @@
-// FAQ and help content for the assistant
+// System prompt for the AI assistant
+export const SYSTEM_PROMPT = `You are an in-app assistant for an internal slide editor web tool used at Aramco Digital.
+
+Your main jobs:
+1. Help users understand and use this web app (projects, templates, saving, shortcuts, etc.).
+2. Answer basic FAQ about Aramco and Aramco Digital only using the provided context.
+
+Important guidelines:
+- If a question about Aramco or Aramco Digital cannot be answered from the provided FAQ/context, say you are not sure and recommend contacting official Aramco / Aramco Digital channels.
+- Do not claim that you are an official representative of Aramco or Aramco Digital.
+- Never reveal or assume internal or confidential information.
+- If the user asks for something outside the scope of the app and the FAQ, politely decline or say you don't know.
+- When appropriate, you may suggest specific actions in the app (e.g., "click Template Library", "open the Projects page", "use Cmd/Ctrl + S to save").
+- Keep your responses concise, helpful, and friendly.
+- Focus on being practical and actionable.`;
+
+// Legacy FAQ content (kept for backward compatibility, but retrieval will use knowledge base files)
 export const FAQ_CONTENT = {
   templates: {
     question: ["template", "templates", "slide template", "add slide"],
@@ -30,13 +46,12 @@ export const FAQ_CONTENT = {
   }
 };
 
-// Generate assistant reply based on user message
+// Legacy function (kept for fallback, but OpenAI integration will use retrieval)
 export function generateAssistantReply(messages: Array<{ role: string; content: string }>): string {
   if (messages.length === 0) {
     return FAQ_CONTENT.general.answer;
   }
 
-  // Get the last user message
   const lastMessage = messages[messages.length - 1];
   if (lastMessage.role !== "user") {
     return FAQ_CONTENT.general.answer;
@@ -44,7 +59,6 @@ export function generateAssistantReply(messages: Array<{ role: string; content: 
 
   const userText = lastMessage.content.toLowerCase();
 
-  // Check each FAQ category
   for (const [key, faq] of Object.entries(FAQ_CONTENT)) {
     if (key === "general") continue;
     
@@ -54,21 +68,5 @@ export function generateAssistantReply(messages: Array<{ role: string; content: 
     }
   }
 
-  // Default response
   return FAQ_CONTENT.general.answer;
 }
-
-// Future: Replace this function to call OpenAI or another LLM
-// export async function generateAssistantReply(messages: Array<{ role: string; content: string }>): Promise<string> {
-//   // Example OpenAI integration:
-//   // const response = await openai.chat.completions.create({
-//   //   model: "gpt-4",
-//   //   messages: messages.map(m => ({ role: m.role, content: m.content })),
-//   //   // Add system prompt with FAQ_CONTENT
-//   // });
-//   // return response.choices[0].message.content;
-//   
-//   // For now, use simple keyword matching
-//   return generateAssistantReply(messages);
-// }
-

@@ -11,7 +11,7 @@ html, body {
 }
 
 body {
-  @apply bg-white text-gray-900 font-inter;
+  @apply bg-white text-gray-900 font-sans;
 }
 
 .btn-primary {
